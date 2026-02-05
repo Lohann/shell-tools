@@ -10,38 +10,109 @@
   exit 1;
 };
 
-# 2. Check if $0 is an absolute or relative path.
-case "${0}" in
-  *[\/]*) _basedir="$(dirname "${0}")" || exit $? ;;
-  *)      _basedir='.' || exit $? ;;
-esac
+if expr a : '\(a\)' >/dev/null 2>&1 && test "X`expr 00001 : '.*\(...\)'`" = X001;
+then st_expr=expr
+else st_expr=false
+fi
+
+if (st_dir=`dirname -- /` && test "X$st_dir" = X/) >/dev/null 2>&1;
+then st_dirname=dirname
+else st_dirname=false
+fi
+
+_basedir=`${st_dirname} -- "${0}" ||
+${st_expr} X"${0}" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X"${0}" : 'X\(//\)[^/]' \| \
+	 X"${0}" : 'X\(//\)$' \| \
+	 X"${0}" : 'X\(/\)' \| . 2>/dev/null ||
+printf '%s\n' X"${0}" |
+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\/\)[^/].*/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\/\)$/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\).*/{
+	    s//\1/
+	    q
+	  }
+	  s/.*/./; q'`
 
 # 3. Make sure we are in "${0}" directory
+test -d "${_basedir}" || {
+  printf %s\\n "directory '${_basedir}' not found" >&2;
+  exit 1;
+};
 test -f "${_basedir}/build.sh" || {
   printf %s\\n "'${_basedir}/build.sh' not found, rerun with an absolute file name" >&2;
   exit 1;
 };
+cd "${_basedir}" || {
+  printf %s\\n "change to directory '${_basedir}' failed $?" >&2;
+  exit 1;
+};
+test -d './scripts' || {
+  printf %s\\n "directory 'scripts' not found" >&2;
+  exit 1;
+};
+test -f './build.sh' || {
+  printf %s\\n "'./build.sh' not found, rerun with an absolute file name" >&2;
+  exit 1;
+};
 
-# 4. find 'scripts/bourne_compatible.sh' script.
-cd "${_basedir}" || exit $?
-test -f "${_basedir}/scripts/bourne_compatible.sh" || {
-  printf %s\\n "file not found '${_basedir}/scripts/bourne_compatible.sh'" >&2;
+# 4. Preload 'scripts/bourne_compatible.sh' script.
+test -f "./scripts/bourne_compatible.sh" || {
+  printf %s\\n "file not found './scripts/bourne_compatible.sh'" >&2;
   exit 1;
 }
+. './scripts/bourne_compatible.sh'
 
-# 5. load dependencies.
-. "${_basedir}/scripts/bourne_compatible.sh"
-. "${_basedir}/scripts/append.sh"
-. "${_basedir}/scripts/quote.sh"
-. "${_basedir}/scripts/map.sh"
+# 5. Preload 'scripts/shell_sanitize.sh' script.
+test -f "./scripts/shell_sanitize.sh" || {
+  printf %s\\n "file not found './scripts/shell_sanitize.sh'" >&2;
+  exit 1;
+}
+. './scripts/shell_sanitize.sh'
 
-# 6. list scripts
-_scripts=''
+# 6. Preload other dependencies used in this script.
+test -f './scripts/append.sh' || {
+  printf %s\\n "file not found './scripts/append.sh'" >&2;
+  exit 1;
+}
+test -f './scripts/quote.sh' || {
+  printf %s\\n "file not found './scripts/quote.sh'" >&2;
+  exit 1;
+}
+test -f './scripts/map.sh' || {
+  printf %s\\n "file not found './scripts/map.sh'" >&2;
+  exit 1;
+}
+. './scripts/append.sh'
+. './scripts/quote.sh'
+. './scripts/map.sh'
+
+# 6. Automatically find all scripts
+_scripts="bourne_compatible=./scripts/bourne_compatible.sh
+shell_sanitize=./scripts/shell_sanitize.sh
+append=./scripts/append.sh
+quote=./scripts/quote.sh
+map=./scripts/map.sh
+"
+
 set +f
 map '
 v="${1##*'/'}";
 v="${v%'.sh'}";
-append _scripts "${v}=${1}${nl}";
+if printf %s "${_scripts}" | grep "^${v}" >/dev/null 2>&1
+then :
+else append _scripts "${v}=${1}${nl}";
+fi
 ' ./scripts/*
 set -f
 
@@ -146,8 +217,10 @@ case "${v}" in
 esac
 EOF
 
-v='case "\${a}" in'
-map 'append v "  $(quote "${1%%=*}")) ;;${nl}"' ${_scripts}
+v='case "${a}" in
+'
+map 'append v "  $(quote "${1%%=*}")) : ;;
+"' ${_scripts}
 append 'v' '  *) is_valid=false; printf "unknown option '%s'\n" "${a}" ;;'
 append 'v' 'esac;'
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF

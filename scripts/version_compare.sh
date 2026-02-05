@@ -1,8 +1,11 @@
 #!/bin/sh
-
-# code adapted from GNU autoconf v2.72
+# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+# Foundation, Inc.
+# ----------------------------------------------------------------------------
+# This is a modified version of m4sh from GNU autoconf v2.72
 # original code:
 # https://github.com/autotools-mirror/autoconf/blob/v2.72/lib/m4sugar/m4sh.m4#L1742-L1805
+
 
 # version_compare <VERSION_1> <OP> <VERSION_2>
 # ----------------------------------------------------------------------------
@@ -32,7 +35,7 @@ version_compare ()
   ( { awk 'BEGIN { exit 0 }' && awk 'BEGIN { exit 123 }'; }; test $? -eq 123; ) > /dev/null 2>&1 || return 127;
 
   # execute awk in a `if` statement, so it doesn't exit when errexit `-e` is enabled.
-  if awk '# Use only awk features that work with 7th edition Unix awk (1978).
+  if LANGUAGE=C LC_ALL=C awk '# Use only awk features that work with 7th edition Unix awk (1978).
   # My, what an old awk you have, Mr. Solaris!
   END {
     while (length(v1) && length(v2)) {
