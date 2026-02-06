@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# sh_sanitize [...ARGS]
+# sh_escape [...ARGS]
 # ----------------------
 # Escape and quote the provided arguments, allowing then
 # to be safely evaluated by shell.
-sh_sanitize ()
+sh_escape ()
 {
   while test $# -gt 0; do
     if tr '\n' ' ' <<EOF | grep '^[-[:alnum:]_=,./:]* $' >/dev/null 2>&1

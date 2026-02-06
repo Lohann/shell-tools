@@ -8,12 +8,14 @@ shell_sanitize
 append
 quote
 map
+test_varname
+basename
 clean_dir
+dirname
 popvar
 pushvar
-sh_sanitize
+sh_escape
 str_to_varname
-test_varname
 version_compare'
 
 # Remove whitespaces
@@ -21,7 +23,7 @@ st_import="$(
 LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '\n' 2>&1 <<EOL
 ${st_import}
 EOL
-)" || { printf '%s' "tr failed '${st_import}'" >&2; exit 1; }
+)" || { printf '%s\n' "[ERROR] tr failed '${st_import}'" >&2; exit 1; }
 
 # Parse options
 st_import="$(
@@ -37,7 +39,7 @@ LC_ALL=C LANGUAGE=C  sed -n \
   -e ':end' 2>&1 <<EOL
 ${st_import}
 EOL
-)" || { printf '%s' "sed failed '${st_import}'" >&2; exit 1; }
+)" || { printf '%s\n' "[ERROR] sed failed '${st_import}'" >&2; exit 1; }
 
 if test -z "${st_import}"
 then exit 0;
@@ -47,11 +49,13 @@ fi
 # Validate options
 (
 _imports="${st_import}"
-is_valid=:
+_st_error='';
+nl='
+';
 for v in ${_imports};
 do
 case "${v}" in 
-  \'*) is_valid=false; eval "printf \"invalid option '%s'\n\" ${v}"; continue ;;
+  \'*) eval "_st_error=\"\${_st_error}invalid option \"${v}'${nl}'"; continue ;;
   *=*) a="${v%%[=]*}" ;;
   *) a="${v}" ;;
 esac
@@ -61,16 +65,19 @@ case "${a}" in
   'append') : ;;
   'quote') : ;;
   'map') : ;;
+  'test_varname') : ;;
+  'basename') : ;;
   'clean_dir') : ;;
+  'dirname') : ;;
   'popvar') : ;;
   'pushvar') : ;;
-  'sh_sanitize') : ;;
+  'sh_escape') : ;;
   'str_to_varname') : ;;
-  'test_varname') : ;;
   'version_compare') : ;;
-  *) is_valid=false; printf "unknown option %s\n" "${a}" ;;esac;
+  *) _st_error="${_st_error}unknown option '${a}'${nl}" ;;
+esac;
 done
-${is_valid} || exit 1;
+test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }
 ) || exit $?;
 
 # display imports
@@ -519,7 +526,7 @@ fi
 if (eval "test -x / || exit 1") > /dev/null 2>&1
 then :
 else
-  echo shell doesn\'\''t '\''test -x <file>'\'' >&2;
+  echo shell doesn\'\''t support '\''test -x <file>'\'' >&2;
   exit 3;
 fi'
 )
@@ -595,6 +602,95 @@ done"
 else :
 fi
 
+## test_varname ##
+if grep '^test_varname' >/dev/null 2>&1 <<EOL
+${st_import}
+EOL
+then (
+eval "${st_import}"
+printf '%s\n' '
+# valid_varname <STRING>
+# ----------------------
+# Check if <STRING> is a valid shell varname
+'"${test_varname}"' ()
+{
+  test $# -gt 0 || return 127;
+  while :; do
+    { test -n "${1#[0-9]}" && test "x${1#*[!A-Za-z0-9_]}" = "x${1}"; } || return 1;
+    test $# -gt 1 || return 0;
+    shift 2> /dev/null || return 127;
+  done
+}'
+)
+else :
+fi
+
+## basename ##
+if grep '^basename' >/dev/null 2>&1 <<EOL
+${st_import}
+EOL
+then (
+eval "${st_import}"
+printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+# Foundation, Inc.
+# ----------------------------------------------------------------------------
+# This is a modified version of m4sh from GNU autoconf v2.72
+# original code:
+# https://github.com/autotools-mirror/autoconf/blob/v2.72/lib/m4sugar/m4sh.m4#L1037-L1079
+
+# basename <PATH>
+# ---------------------
+# Polyfill for the command '\''basename FILE-NAME'\''. Not all systems have
+# basename.
+#
+# Avoid Solaris 9 /usr/ucb/basename, as '\''basename /'\'' outputs an empty line.
+# Also, traditional basename mishandles --
+if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" = "X/";
+then :
+else :
+'"${basename}"' ()
+{
+  test $# -gt 0 || { echo '\''basename: missing operand'\'' >&2; return 127; };
+  if test x"${1}" = '\''x--'\''
+  then
+    shift > /dev/null 2>&1 || { echo '\''basename: shift failed'\'' >&2; return 127; };
+    test $# -gt 0 || { echo '\''basename: missing operand'\'' >&2; return 127; };
+  else :
+  fi
+
+  # Prefer `expr` to `printf|sed`, since expr is usually faster and it handles
+  # backslashes and newlines correctly.  However, older expr
+  # implementations (e.g. SunOS 4 expr and Solaris 8 /usr/ucb/expr) have
+  # a silly length limit that causes `expr` to fail if the matched
+  # substring is longer than 120 bytes.  So fall back on `printf|sed` if
+  # `expr` fails.
+  {
+    expr a : '\''\(a\)'\'' >/dev/null 2>&1 &&
+    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 &&
+    expr X/"${1}" : '\''.*/\([^/][^/]*\)/*$'\'' \| \
+	    X"${1}" : '\''X\(//\)$'\'' \| \
+	    X"${1}" : '\''X\(/\)'\'' \| .. 2>/dev/null;
+  } || {
+    printf '\''%s\n'\'' X/"$1" | sed '\''/^.*\/\([^/][^/]*\)\/*$/{
+	      s//\1/
+	      q
+	    }
+	    /^X\/\(\/\/\)$/{
+	      s//\1/
+	      q
+	    }
+	    /^X\/\(\/\).*/{
+	      s//\1/
+	      q
+	    }
+	    s/.*/./; q'\'';
+  };
+}
+fi'
+)
+else :
+fi
+
 ## clean_dir ##
 if grep '^clean_dir' >/dev/null 2>&1 <<EOL
 ${st_import}
@@ -613,6 +709,74 @@ printf '%s\n' '
   find "${1}" -type d ! -perm -700 -exec chmod u+rwx {} \; || :;
   rm -fr "${1}"* "${1}".[!.] "${1}".??*
 }'
+)
+else :
+fi
+
+## dirname ##
+if grep '^dirname' >/dev/null 2>&1 <<EOL
+${st_import}
+EOL
+then (
+eval "${st_import}"
+printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+# Foundation, Inc.
+# ----------------------------------------------------------------------------
+# This is a modified version of m4sh from GNU autoconf v2.72
+# original code:
+# https://github.com/autotools-mirror/autoconf/blob/v2.72/lib/m4sugar/m4sh.m4#L1037-L1079
+
+# dirname <PATH>
+# ---------------------
+# Polyfill for the command '\''dirname FILE-NAME'\''. Not all systems have
+# dirname.
+if (st_dir=`dirname -- /` && test "X$st_dir" = X/) >/dev/null 2>&1;
+then :
+else :
+'"${dirname}"' ()
+{
+  test $# -gt 0 || { echo '\''dirname: missing operand'\'' >&2; return 127; };
+  if test x"${1}" = '\''x--'\''
+  then
+    shift > /dev/null || { echo '\''dirname: shift failed'\'' >&2; return 127; };
+    test $# -gt 0 || { echo '\''dirname: missing operand'\'' >&2; return 127; };
+  else :
+  fi
+
+  # Prefer `expr` to `printf|sed`, since expr is usually faster and it handles
+  # backslashes and newlines correctly.  However, older expr
+  # implementations (e.g. SunOS 4 expr and Solaris 8 /usr/ucb/expr) have
+  # a silly length limit that causes `expr` to fail if the matched
+  # substring is longer than 120 bytes.  So fall back on `printf|sed` if
+  # `expr` fails.
+  {
+    expr a : '\''\(a\)'\'' >/dev/null 2>&1 &&
+    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 &&
+    expr X"${1}" : '\''X\(.*[^/]\)//*[^/][^/]*/*$'\'' \| \
+	  X"${1}" : '\''X\(//\)[^/]'\'' \| \
+	  X"${1}" : '\''X\(//\)$'\'' \| \
+	  X"${1}" : '\''X\(/\)'\'' \| . 2>/dev/null;
+  } || {
+    printf '\''%s\n'\'' X"${1}" | sed '\''/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\/\)[^/].*/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\/\)$/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\).*/{
+	    s//\1/
+	    q
+	  }
+	  s/.*/./; q'\'';
+  };
+}
+fi'
 )
 else :
 fi
@@ -667,18 +831,18 @@ ${1}_level=\$((\${${1}_level}+1))" || return $?;
 else :
 fi
 
-## sh_sanitize ##
-if grep '^sh_sanitize' >/dev/null 2>&1 <<EOL
+## sh_escape ##
+if grep '^sh_escape' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
 then (
 eval "${st_import}"
 printf '%s\n' '
-# sh_sanitize [...ARGS]
+# sh_escape [...ARGS]
 # ----------------------
 # Escape and quote the provided arguments, allowing then
 # to be safely evaluated by shell.
-'"${sh_sanitize}"' ()
+'"${sh_escape}"' ()
 {
   while test $# -gt 0; do
     if tr '\''\n'\'' '\'' '\'' <<EOF | grep '\''^[-[:alnum:]_=,./:]* $'\'' >/dev/null 2>&1
@@ -717,29 +881,6 @@ printf '%s\n' '
 
   # Avoid depending upon Character Ranges.
   printf '\''%s\n'\'' "${1}" | sed '\''y%*+%pp%;s%[^_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]%_%g'\''
-}'
-)
-else :
-fi
-
-## test_varname ##
-if grep '^test_varname' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
-# valid_varname <STRING>
-# ----------------------
-# Check if <STRING> is a valid shell varname
-'"${test_varname}"' ()
-{
-  test $# -gt 0 || return 127;
-  while :; do
-    { test -n "${1#[0-9]}" && test "x${1#*[!A-Za-z0-9_]}" = "x${1}"; } || return 1;
-    test $# -gt 1 || return 0;
-    shift 2> /dev/null || return 127;
-  done
 }'
 )
 else :
@@ -870,4 +1011,3 @@ fi
 
 # cleanup
 st_import=; unset 'st_import';
-

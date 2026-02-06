@@ -48,6 +48,6 @@ fi
 if (eval "test -x / || exit 1") > /dev/null 2>&1
 then :
 else
-  echo shell doesn\'t 'test -x <file>' >&2;
+  echo shell doesn\'t support 'test -x <file>' >&2;
   exit 3;
 fi
