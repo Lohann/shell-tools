@@ -13,6 +13,13 @@ if test ${ZSH_VERSION+y} && (emulate sh) >/dev/null 2>&1; then
   emulate sh
   # shellcheck disable=SC2034
   NULLCMD=:
+
+  # If there are no arguments, ""$@"" may expand to a single empty argument (some
+  # older sh implementations) or to no arguments (bash, pdksh, Solaris sh, zsh).
+  # This is commonly worked around by using "${1+"$@"}". However, this workaround
+  # fails for zsh: each argument will be subjected to word splitting. To avoid this,
+  # define this global alias before using the workaround:
+  
   # Pre-4.2 versions of Zsh do word splitting on ${1+"$@"}, which
   # is contrary to our usage.  Disable this feature.
   # shellcheck disable=SC2142
@@ -65,7 +72,8 @@ done
 # Enable features we need and disable problematic ones.
 if _st_opts=`(set -o) 2>/dev/null`;
 then
-  for _st_code in H a x v m f e u C B pipefail; do
+  for _st_code in 'H' 'a' 'x' 'v' 'm' 'f' 'e' 'u' 'C' 'B' 'pipefail'
+  do
     case ${_st_code} in 
       H) _st_name=histexpand;  _st_enabled=no  ;; # history expansion [disabled]
       a) _st_name=allexport;   _st_enabled=no  ;; # export all variables assigned to [disabled]
@@ -327,7 +335,8 @@ fi
 
 if _st_opts=`(set -o) 2>/dev/null`;
 then
-  for _st_code in H a x v m f e u C B pipefail; do
+  for _st_code in 'H' 'a' 'x' 'v' 'm' 'f' 'e' 'u' 'C' 'B' 'pipefail'
+  do
     case ${_st_code} in 
       H) _st_name=histexpand;  _st_enabled=no  ;; # history expansion [disabled]
       a) _st_name=allexport;   _st_enabled=no  ;; # export all variables assigned to [disabled]

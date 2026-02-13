@@ -151,7 +151,7 @@ if grep '^${2}' >/dev/null 2>&1 <<EOL
 EOL
 then (
 eval \"\${${1}}\"
-printf '%s\n' $(_st_quote_file "${2}" "${2}" "${3}" 2>&1)
+printf '%s\n' `_st_quote_file "${2}" "${2}" "${3}" 2>&1`
 )
 else :
 fi
@@ -165,7 +165,7 @@ _st_header()
 {
 v=''
 map 'append v "${1%%=*}${nl}"' ${_scripts}
-v="$(quote "${v}")${nl}"
+v=`quote "${v}"`"${nl}"
 
 sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
 ##################
@@ -176,14 +176,14 @@ EOF
 
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
 # Remove whitespaces
-${1}="$(
+${1}="`
 LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '\n' 2>&1 <<EOL
 ${${1}}
 EOL
-)" || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }
+`" || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }
 
 # Parse options
-${1}="$(
+${1}="`
 LC_ALL=C LANGUAGE=C  sed -n \
   -e "/^\n*$/b end" \
   -e 's/^\([A-Za-z_][A-Za-z0-9_]*\)$/\1=\1/; t ok' \
@@ -196,7 +196,7 @@ LC_ALL=C LANGUAGE=C  sed -n \
   -e ':end' 2>&1 <<EOL
 ${${1}}
 EOL
-)" || { printf '%s\n' "[ERROR] sed failed '${${1}}'" >&2; exit 1; }
+`" || { printf '%s\n' "[ERROR] sed failed '${${1}}'" >&2; exit 1; }
 
 if test -z "${${1}}"
 then exit 0;
@@ -220,7 +220,7 @@ EOF
 
 v='case "${a}" in
 '
-map 'append v "  $(quote "${1%%=*}")) : ;;
+map 'append v "  `quote "${1%%=*}"`) : ;;
 "' ${_scripts}
 append 'v' '  *) _st_error="${_st_error}unknown option '\''${a}'\''${nl}" ;;
 '
@@ -252,7 +252,7 @@ _st_build()
   eval "${1}='#!/bin/sh
 
 '"
-  eval "append '${1}' $(_st_header)" || { printf %s\\n "eval failed" >&2; exit 1; }
+  eval "append '${1}' `_st_header`" || { printf %s\\n "eval failed" >&2; exit 1; }
   for v in ${_scripts}; do
     _st_import "${1}" "${v%%=*}" "${v#*=}"
   done
@@ -301,7 +301,7 @@ do
   fi
 
   case "${_st_option}" in
-    *=?*) _st_optarg="$(expr "X${_st_option}" : '[^=]*=\(.*\)')" ;;
+    *=?*) _st_optarg="`expr "X${_st_option}" : '[^=]*=\(.*\)'`" ;;
     *=)   _st_optarg= ;;
     *)    _st_optarg=yes ;;
   esac
@@ -329,7 +329,7 @@ case "${_st_prev}" in
   '') : ;;
   output) _st_output='' ;;
   *)
-    _st_option="--$(echo "${_st_prev}" | sed 's/_/-/g')"
+    _st_option="--`echo "${_st_prev}" | sed 's/_/-/g'`"
     printf '%s\n\n' "[ERROR] missing argument to ${_st_option}" >&2;
     exit 1;
     ;;
@@ -360,7 +360,7 @@ case "${_st_output}" in
       printf '%s\n' "[ERROR] '--output' cannot be empty" >&2;
       exit 1;
     };
-    _st_dir="$(dirname -- "${_st_output}")" || {
+    _st_dir="`dirname -- "${_st_output}"`" || {
       printf '%s\n' "[ERROR] cannot determine directory of '${_st_output}'" >&2;
       exit 1;
     };
@@ -395,7 +395,8 @@ fi' ./scripts/*
 set -f
 
 # 9. Merge all scripts
-_st_body="$(eval "_st_build '${_st_import}' > /dev/null 2>&1 && printf '%s\n' \"\${${_st_import}}\"")"
+eval "_st_body=\`_st_build '${_st_import}' > /dev/null 2>&1 && printf '%s\n' \"\${${_st_import}}\"\`"
+# _st_body="$(eval "_st_build '${_st_import}' > /dev/null 2>&1 && printf '%s\n' \"\${${_st_import}}\"")"
 
 # 10. Write to var `_st_body` to output.
 case "${_st_output}" in
