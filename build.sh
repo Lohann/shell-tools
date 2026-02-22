@@ -215,18 +215,19 @@ _imports="${${1}}"
 _st_error='';
 nl='
 ';
+st_test='['\'']*'
 for v in ${_imports};
 do
 case "${v}" in 
-  \'*) eval "_st_error=\"\${_st_error}invalid option \"${v}'${nl}'"; continue ;;
-  *=*) a="${v%%[=]*}" ;;
-  *) a="${v}" ;;
+  $st_test ) eval "_st_error=\"\${_st_error}invalid option \"${v}'${nl}'"; continue ;;
+  *=* ) a="${v%%[=]*}" ;;
+  * ) a="${v}" ;;
 esac
 EOF
 
 v='case "${a}" in
 '
-map 'append v "  $(quote "${1%%=*}")) : ;;
+map 'append v "  $(printf %s "${1%%=*}") ) : ;;
 "' ${_scripts}
 append 'v' '  *) _st_error="${_st_error}unknown option '\''${a}'\''${nl}" ;;
 '
@@ -254,7 +255,7 @@ sed -e "s/'/'\\\\''/g" -e "\$s/\$/'/" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
 printf '%s\n' '# IMPORTED MODULES #'
 printf '%s=' "${1}"
 # display imports
-sed -e '$!s/$/ \\/' -e "1s/^/'/" -e '$s/$/'\''/' <<EOL
+sed -e "1s/^/'/" -e '$s/$/'\''/' <<EOL
 ${${1}}
 EOL
 printf '\n'

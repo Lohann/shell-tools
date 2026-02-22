@@ -17,6 +17,7 @@ pushvar
 sh_escape
 str_to_varname
 trim
+unix_timestamp
 version_compare
 '
 
@@ -54,29 +55,31 @@ _imports="${st_import}"
 _st_error='';
 nl='
 ';
+st_test='['\'']*'
 for v in ${_imports};
 do
 case "${v}" in 
-  \'*) eval "_st_error=\"\${_st_error}invalid option \"${v}'${nl}'"; continue ;;
-  *=*) a="${v%%[=]*}" ;;
-  *) a="${v}" ;;
+  $st_test ) eval "_st_error=\"\${_st_error}invalid option \"${v}'${nl}'"; continue ;;
+  *=* ) a="${v%%[=]*}" ;;
+  * ) a="${v}" ;;
 esac
 case "${a}" in
-  'bourne_compatible') : ;;
-  'shell_sanitize') : ;;
-  'append') : ;;
-  'quote') : ;;
-  'map') : ;;
-  'test_varname') : ;;
-  'basename') : ;;
-  'clean_dir') : ;;
-  'dirname') : ;;
-  'popvar') : ;;
-  'pushvar') : ;;
-  'sh_escape') : ;;
-  'str_to_varname') : ;;
-  'trim') : ;;
-  'version_compare') : ;;
+  bourne_compatible ) : ;;
+  shell_sanitize ) : ;;
+  append ) : ;;
+  quote ) : ;;
+  map ) : ;;
+  test_varname ) : ;;
+  basename ) : ;;
+  clean_dir ) : ;;
+  dirname ) : ;;
+  popvar ) : ;;
+  pushvar ) : ;;
+  sh_escape ) : ;;
+  str_to_varname ) : ;;
+  trim ) : ;;
+  unix_timestamp ) : ;;
+  version_compare ) : ;;
   *) _st_error="${_st_error}unknown option '${a}'${nl}" ;;
 esac;
 done
@@ -86,12 +89,12 @@ printf "%s\n\n" '#!/bin/sh'
 printf '%s\n' '# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-20260222'
 printf '%s\n' "#   DATE: `date '+%Y-%m-%d'`"
 printf '%s\n' '# SOURCE: https://github.com/Lohann/shell-tools'
-printf '%s\n' '# COMMIT: 0ac9d68b11b66cf6b3136134d34575b823942f20'
+printf '%s\n' '# COMMIT: e5b84b296a2f3653333bb2d0c44d748ad79c7b9c'
 printf '\n'
 printf '%s\n' '# IMPORTED MODULES #'
 printf '%s=' "st_import"
 # display imports
-sed -e '$!s/$/ \\/' -e "1s/^/'/" -e '$s/$/'\''/' <<EOL
+sed -e "1s/^/'/" -e '$s/$/'\''/' <<EOL
 ${st_import}
 EOL
 printf '\n'
@@ -158,69 +161,33 @@ export LANG
 # also avoids known problems related to "unset" and subshell syntax
 # in other old shells (e.g. bash 2.01 and pdksh 5.2.14).
 for _st_val in BASH_ENV ENV MAIL MAILPATH CDPATH
-do
-  if eval "test \${${_st_val}+y}"
-  then { ( (unset "${_st_val}") || exit 1) >/dev/null 2>&1 && unset "${_st_val}"; } || :
-  else :
-  fi
+do eval "test \${${_st_val}+y}" && \
+( (unset "${_st_val}") || exit 1) >/dev/null 2>&1 && unset "${_st_val}" || :
 done
-
-# Enable features we need and disable problematic ones.
-if _st_opts=`(set -o) 2>/dev/null`;
-then
-  for _st_code in H a x v m f e u C B pipefail; do
-    case ${_st_code} in 
-      H) _st_name=histexpand;  _st_enabled=no  ;; # history expansion [disabled]
-      a) _st_name=allexport;   _st_enabled=no  ;; # export all variables assigned to [disabled]
-      x) _st_name=xtrace;      continue        ;; # xtrace  [keep default]
-      v) _st_name=verbose;     continue        ;; # verbose [keep default]
-      m) _st_name=monitor;     _st_enabled=no  ;; # monitor [disabled]
-      f) _st_name=noglob;      _st_enabled=yes ;; # disable pathname expansion [enabled]
-      e) _st_name=errexit;     _st_enabled=no  ;; # exit on error [disable]
-      u) _st_name=nounset;     _st_enabled=no  ;; # no unset [disable]
-      C) _st_name=noclobber;   _st_enabled=yes ;; # no clobber [enabled]
-      B) _st_name=braceexpand; _st_enabled=no  ;; # brace expansion [disable]
-      pipelfail) _st_name=pipefail;               # pipefail [enabled]
-                 _st_enabled=yes ;; 
-      *) continue ;;
-    esac
-
-    case "$-" in
-      *"${_st_code}"*)
-        # option enabled
-        test x"${_st_enabled}" = xyes || {
-          set +o ${_st_name} 2> /dev/null ||
-            set +${_st_code} || :;
-        };
-        continue ;;
-      *) : ;;
-    esac
-    case "${_st_opts}" in
-      *"${_st_name}"*)
-        # option disabled
-        test x"${_st_enabled}" = xno || {
-          set -o ${_st_name} 2> /dev/null ||
-            set -${_st_code} || :;
-        } ;;
-      *)
-        # option not supported
-        continue ;;
-    esac
-  done
-else :
-fi
-
-# cleanup possibly unwanted exported variables if '\''set -a'\'' was enabled.
-{ test ${_st_val+y} && ( (unset '\''_st_val'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_val'\''; } || :
-{ test ${_st_code+y} && ( (unset '\''_st_code'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_code'\''; } || :
-{ test ${_st_opts+y} && ( (unset '\''_st_opts'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_opts'\''; } || :
-{ test ${_st_name+y} && ( (unset '\''_st_name'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_name'\''; } || :
-{ test ${_st_enabled+y} && ( (unset '\''_st_enabled'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_enabled'\''; } || :
 
 # Ensure that fds 0, 1, and 2 are open.
 if (exec 3>&0) 2>/dev/null; then :; else exec 0</dev/null; fi
 if (exec 3>&1) 2>/dev/null; then :; else exec 1>/dev/null; fi
 if (exec 3>&2)            ; then :; else exec 2>/dev/null; fi
+
+# Disable shell features which may cause this script to fail
+# those features are saved in st_orig_opts and restored later.
+_st_opts='\'''\''
+for _st_code in '\''H'\'' '\''a'\'' '\''m'\'' '\''f'\'' '\''e'\'' '\''u'\'' '\''C'\'' '\''B'\''
+do
+  _st_val="*[${_st_code}]*"
+  case $_st_opts in $_st_val ) continue ;; * ) : ;; esac
+  case $- in
+    $_st_val ) _st_opts="${_st_opts}${_st_code}" ;;
+    *[HamfeuCB]* ) continue ;;
+    * ) break ;;
+  esac
+done
+test x${_st_opts} = x || \
+  { set +${_st_opts} && \
+    { test ${st_orig_opts+y} || \
+      { st_orig_opts=${_st_opts} && export st_orig_opts; }; }; }
+( (unset '\''_st_val'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_val'\'' '\''_st_code'\'' '\''_st_opts'\'' || :
 
 # The user is always right.
 if ${PATH_SEPARATOR+false} :; then
@@ -318,10 +285,10 @@ test -x / || exit 1"
   fi
 
   _st_suggested='\''  _st_lineno_1='\''
-  _st_suggested=${_st_suggested}${LINENO:-}
+  _st_suggested=${_st_suggested}${LINENO}
   _st_suggested=${_st_suggested}" _st_lineno_1a=\$LINENO
 _st_lineno_2="
-  _st_suggested=${_st_suggested}${LINENO:-}
+  _st_suggested=${_st_suggested}${LINENO}
   _st_suggested=${_st_suggested}" _st_lineno_2a=\$LINENO
 eval '\''test \"x\$_st_lineno_1'\''\$_st_run'\''\" != \"x\$_st_lineno_2'\''\$_st_run'\''\" &&
 test \"x\`expr \$_st_lineno_1'\''\$_st_run'\'' + 1\`\" = \"x\$_st_lineno_2'\''\$_st_run'\''\"'\'' || exit 1"
@@ -428,55 +395,25 @@ $0: script under such a shell if you do have one."
   fi
 fi
 
-if _st_opts=`(set -o) 2>/dev/null`;
+# re-enable posix compatible shell options previously disabled.
+if test ${st_orig_opts+y} \
+&& test "x${st_orig_opts}" != x \
+&& (set -o) > /dev/null 2>&1
 then
-  for _st_code in H a x v m f e u C B pipefail; do
-    case ${_st_code} in 
-      H) _st_name=histexpand;  _st_enabled=no  ;; # history expansion [disabled]
-      a) _st_name=allexport;   _st_enabled=no  ;; # export all variables assigned to [disabled]
-      x) _st_name=xtrace;      continue        ;; # xtrace  [keep default]
-      v) _st_name=verbose;     continue        ;; # verbose [keep default]
-      m) _st_name=monitor;     _st_enabled=no  ;; # monitor [disabled]
-      f) _st_name=noglob;      _st_enabled=no  ;; # disable pathname expansion [disable]
-      e) _st_name=errexit;     _st_enabled=yes ;; # exit on error [enabled]
-      u) _st_name=nounset;     _st_enabled=yes ;; # no unset [enabled]
-      C) _st_name=noclobber;   _st_enabled=no  ;; # no clobber [disable]
-      B) _st_name=braceexpand; _st_enabled=no  ;; # brace expansion [disable]
-      pipelfail) _st_name=pipefail;               # pipefail [enabled]
-                 _st_enabled=yes ;; 
-      *) continue ;;
-    esac
-
-    case "$-" in
-      *"${_st_code}"*)
-        # option enabled
-        test x"${_st_enabled}" = xyes || {
-          set +o ${_st_name} 2> /dev/null ||
-            set +${_st_code} || :;
-        };
-        continue ;;
-      *) : ;;
-    esac
-    case "${_st_opts}" in
-      *"${_st_name}"*)
-        # option disabled
-        test x"${_st_enabled}" = xno || {
-          set -o ${_st_name} 2> /dev/null ||
-            set -${_st_code} || :;
-        } ;;
-      *)
-        # option not supported
-        continue ;;
-    esac
+  for _st_code in '\''f'\'' '\''e'\'' '\''u'\'' '\''C'\''
+  do
+    _st_pat="*[${_st_code}]*"
+    case $st_orig_opts in $_st_pat ) : ;; * ) continue ;; esac
+    case $- in $_st_pat ) continue ;; * ) set "-${_st_code}" ;; esac
   done
 else :
 fi
 
 # cleanup
-{ test ${_st_code+y} && ( (unset '\''_st_code'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_code'\''; } || :
-{ test ${_st_opts+y} && ( (unset '\''_st_opts'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_opts'\''; } || :
-{ test ${_st_name+y} && ( (unset '\''_st_name'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_name'\''; } || :
-{ test ${_st_enabled+y} && ( (unset '\''_st_enabled'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_enabled'\''; } || :'
+st_orig_opts='\'''\''; unset '\''st_orig_opts'\''
+_st_opts='\'''\''; unset '\''_st_opts'\''
+_st_code='\'''\''; unset '\''_st_code'\''
+_st_pat='\'''\''; unset '\''_st_pat'\'''
 )
 else :
 fi
@@ -584,7 +521,7 @@ printf '%s\n' '
 # wraps the string in single quotes.
 '"${quote}"' ()
 {
-  printf %s "x${1}x" | sed -e "s/'\''/'\''\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''
+  printf %s "x${*}x" | sed -e "s/'\''/'\''\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''
 }'
 )
 else :
@@ -720,8 +657,29 @@ printf '%s\n' '
 '"${clean_dir}"' ()
 {
   test $# -eq 1 || return 127;
+  test "x${1}" != x || { printf '\''%s\n'\'' "directory name is empty" >&2; return 127; };
   test -d "${1}" || { printf '\''%s\n'\'' "directory not found '\''${1}'\''" >&2; return 1; };
-  find "${1}" -type d ! -perm -700 -exec chmod u+rwx {} \; || :;
+
+  # Check if the directory is empty
+  # ref: https://www.etalabs.net/sh_tricks.html
+  # (
+  case "$-" in
+    *f* ) printf '\''%s\n'\'' "pathname expansion is disabled, please enable it '\''set +f'\''" >&2; return 127 ;;
+    * ) : ;;
+  esac
+  (
+  cd "${1}" || return 127
+  set x .[!.]* && shift || return 127
+  test ! -f "${1}" || return 0
+  set x ..?*  && shift || return 127
+  test ! -f "${1}" || return 0
+  set x * && shift || return 127
+  test ! -f "${1}" || return 0
+  shift || return 127
+  return 7
+  ) || case $? in 7 ) return 0 ;; * ) return 127 ;; esac
+  
+  find "${1}" -type d ! -perm -700 -exec chmod u+rwx {} \; || :
   rm -fr "${1}"* "${1}".[!.] "${1}".??*
 }'
 )
@@ -880,8 +838,8 @@ eval "${st_import}"
 printf '%s\n' '
 # sh_escape [...ARGS]
 # ----------------------
-# Escape and quote the provided arguments, allowing then
-# to be safely evaluated by shell.
+# Escape and quote the provided arguments, the printed string
+# string can be safely evaluated by shell.
 '"${sh_escape}"' ()
 {
   while test $# -gt 0; do
@@ -958,6 +916,50 @@ printf '%s\n' '
     -e '\''s/[[:space:]]*$//'\'' \
     -e '\''p'\''
 }'
+)
+else :
+fi
+
+## unix_timestamp ##
+if grep '^unix_timestamp' >/dev/null 2>&1 <<EOL
+${st_import}
+EOL
+then (
+eval "${st_import}"
+printf '%s\n' '
+# Sadly `date +%s` is not portable.
+# The only magic number in here is 135140, the number of days between
+# 1600-01-01 and 1970-01-01 treating both as Gregorian dates. 1600 is
+# used as the multiple-of-400 epoch here instead of 2000 since C-style
+# division behaves badly with negative dividends.
+#
+# Original code:
+# https://www.etalabs.net/sh_tricks.html
+
+# unix_timestamp
+# ---------------------
+# Prints the unix timestamp, which is seconds passed since January 1st, 1970 at UTC
+if (eval '\''st_time=`date "+%s"` && test "$st_time" -gt 1000000000'\'') 2> /dev/null
+then eval "
+'"${unix_timestamp}"' ()
+{
+  date '\''+%s'\'' 
+}"
+elif (eval "test \$(( 1 + 1 )) = 2") 2>/dev/null
+then eval '\''
+'"${unix_timestamp}"' ()
+{
+printf %s\\n $((`TZ=GMT0 LANGUAGE=C LC_ALL=C date \
+'\''\'\'''\''+((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400+1%j-1000-135140)*86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)'\''\'\'''\''`))
+}'\''
+else eval '\''
+unix_timestamp () 
+{ 
+(d=`TZ=GMT0 LANGUAGE=C LC_ALL=C date '\''\'\'''\''+y=%Y;j=1%j;h=1%H;m=1%M;s=1%S'\''\'\'''\'' 2> /dev/null` && \
+eval "${d}" 2> /dev/null && \
+expr \( \( $y \- 1600 \) \* 365 \+ \( $y \- 1600 \) \/ 4 \- \( $y \- 1600 \) \/ 100 \+ \( $y \- 1600 \) \/ 400 \+ $j \- 1000 \- 135140 \) \* 86400 \+ \( $h \- 100 \) \* 3600 \+ \( $m \- 100 \) \* 60 \+ \( $s \- 100 \))
+}'\''
+fi # unix_timestamp'
 )
 else :
 fi

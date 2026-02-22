@@ -2,8 +2,8 @@
 
 # sh_escape [...ARGS]
 # ----------------------
-# Escape and quote the provided arguments, allowing then
-# to be safely evaluated by shell.
+# Escape and quote the provided arguments, the printed string
+# string can be safely evaluated by shell.
 sh_escape ()
 {
   while test $# -gt 0; do

@@ -55,69 +55,33 @@ export LANG
 # also avoids known problems related to "unset" and subshell syntax
 # in other old shells (e.g. bash 2.01 and pdksh 5.2.14).
 for _st_val in BASH_ENV ENV MAIL MAILPATH CDPATH
-do
-  if eval "test \${${_st_val}+y}"
-  then { ( (unset "${_st_val}") || exit 1) >/dev/null 2>&1 && unset "${_st_val}"; } || :
-  else :
-  fi
+do eval "test \${${_st_val}+y}" && \
+( (unset "${_st_val}") || exit 1) >/dev/null 2>&1 && unset "${_st_val}" || :
 done
-
-# Enable features we need and disable problematic ones.
-if _st_opts=`(set -o) 2>/dev/null`;
-then
-  for _st_code in H a x v m f e u C B pipefail; do
-    case ${_st_code} in 
-      H) _st_name=histexpand;  _st_enabled=no  ;; # history expansion [disabled]
-      a) _st_name=allexport;   _st_enabled=no  ;; # export all variables assigned to [disabled]
-      x) _st_name=xtrace;      continue        ;; # xtrace  [keep default]
-      v) _st_name=verbose;     continue        ;; # verbose [keep default]
-      m) _st_name=monitor;     _st_enabled=no  ;; # monitor [disabled]
-      f) _st_name=noglob;      _st_enabled=yes ;; # disable pathname expansion [enabled]
-      e) _st_name=errexit;     _st_enabled=no  ;; # exit on error [disable]
-      u) _st_name=nounset;     _st_enabled=no  ;; # no unset [disable]
-      C) _st_name=noclobber;   _st_enabled=yes ;; # no clobber [enabled]
-      B) _st_name=braceexpand; _st_enabled=no  ;; # brace expansion [disable]
-      pipelfail) _st_name=pipefail;               # pipefail [enabled]
-                 _st_enabled=yes ;; 
-      *) continue ;;
-    esac
-
-    case "$-" in
-      *"${_st_code}"*)
-        # option enabled
-        test x"${_st_enabled}" = xyes || {
-          set +o ${_st_name} 2> /dev/null ||
-            set +${_st_code} || :;
-        };
-        continue ;;
-      *) : ;;
-    esac
-    case "${_st_opts}" in
-      *"${_st_name}"*)
-        # option disabled
-        test x"${_st_enabled}" = xno || {
-          set -o ${_st_name} 2> /dev/null ||
-            set -${_st_code} || :;
-        } ;;
-      *)
-        # option not supported
-        continue ;;
-    esac
-  done
-else :
-fi
-
-# cleanup possibly unwanted exported variables if 'set -a' was enabled.
-{ test ${_st_val+y} && ( (unset '_st_val') || exit 1) >/dev/null 2>&1 && unset '_st_val'; } || :
-{ test ${_st_code+y} && ( (unset '_st_code') || exit 1) >/dev/null 2>&1 && unset '_st_code'; } || :
-{ test ${_st_opts+y} && ( (unset '_st_opts') || exit 1) >/dev/null 2>&1 && unset '_st_opts'; } || :
-{ test ${_st_name+y} && ( (unset '_st_name') || exit 1) >/dev/null 2>&1 && unset '_st_name'; } || :
-{ test ${_st_enabled+y} && ( (unset '_st_enabled') || exit 1) >/dev/null 2>&1 && unset '_st_enabled'; } || :
 
 # Ensure that fds 0, 1, and 2 are open.
 if (exec 3>&0) 2>/dev/null; then :; else exec 0</dev/null; fi
 if (exec 3>&1) 2>/dev/null; then :; else exec 1>/dev/null; fi
 if (exec 3>&2)            ; then :; else exec 2>/dev/null; fi
+
+# Disable shell features which may cause this script to fail
+# those features are saved in st_orig_opts and restored later.
+_st_opts=''
+for _st_code in 'H' 'a' 'm' 'f' 'e' 'u' 'C' 'B'
+do
+  _st_val="*[${_st_code}]*"
+  case $_st_opts in $_st_val ) continue ;; * ) : ;; esac
+  case $- in
+    $_st_val ) _st_opts="${_st_opts}${_st_code}" ;;
+    *[HamfeuCB]* ) continue ;;
+    * ) break ;;
+  esac
+done
+test x${_st_opts} = x || \
+  { set +${_st_opts} && \
+    { test ${st_orig_opts+y} || \
+      { st_orig_opts=${_st_opts} && export st_orig_opts; }; }; }
+( (unset '_st_val') || exit 1) >/dev/null 2>&1 && unset '_st_val' '_st_code' '_st_opts' || :
 
 # The user is always right.
 if ${PATH_SEPARATOR+false} :; then
@@ -215,10 +179,10 @@ test -x / || exit 1"
   fi
 
   _st_suggested='  _st_lineno_1='
-  _st_suggested=${_st_suggested}${LINENO:-}
+  _st_suggested=${_st_suggested}${LINENO}
   _st_suggested=${_st_suggested}" _st_lineno_1a=\$LINENO
 _st_lineno_2="
-  _st_suggested=${_st_suggested}${LINENO:-}
+  _st_suggested=${_st_suggested}${LINENO}
   _st_suggested=${_st_suggested}" _st_lineno_2a=\$LINENO
 eval 'test \"x\$_st_lineno_1'\$_st_run'\" != \"x\$_st_lineno_2'\$_st_run'\" &&
 test \"x\`expr \$_st_lineno_1'\$_st_run' + 1\`\" = \"x\$_st_lineno_2'\$_st_run'\"' || exit 1"
@@ -325,52 +289,22 @@ $0: script under such a shell if you do have one."
   fi
 fi
 
-if _st_opts=`(set -o) 2>/dev/null`;
+# re-enable posix compatible shell options previously disabled.
+if test ${st_orig_opts+y} \
+&& test "x${st_orig_opts}" != x \
+&& (set -o) > /dev/null 2>&1
 then
-  for _st_code in H a x v m f e u C B pipefail; do
-    case ${_st_code} in 
-      H) _st_name=histexpand;  _st_enabled=no  ;; # history expansion [disabled]
-      a) _st_name=allexport;   _st_enabled=no  ;; # export all variables assigned to [disabled]
-      x) _st_name=xtrace;      continue        ;; # xtrace  [keep default]
-      v) _st_name=verbose;     continue        ;; # verbose [keep default]
-      m) _st_name=monitor;     _st_enabled=no  ;; # monitor [disabled]
-      f) _st_name=noglob;      _st_enabled=no  ;; # disable pathname expansion [disable]
-      e) _st_name=errexit;     _st_enabled=yes ;; # exit on error [enabled]
-      u) _st_name=nounset;     _st_enabled=yes ;; # no unset [enabled]
-      C) _st_name=noclobber;   _st_enabled=no  ;; # no clobber [disable]
-      B) _st_name=braceexpand; _st_enabled=no  ;; # brace expansion [disable]
-      pipelfail) _st_name=pipefail;               # pipefail [enabled]
-                 _st_enabled=yes ;; 
-      *) continue ;;
-    esac
-
-    case "$-" in
-      *"${_st_code}"*)
-        # option enabled
-        test x"${_st_enabled}" = xyes || {
-          set +o ${_st_name} 2> /dev/null ||
-            set +${_st_code} || :;
-        };
-        continue ;;
-      *) : ;;
-    esac
-    case "${_st_opts}" in
-      *"${_st_name}"*)
-        # option disabled
-        test x"${_st_enabled}" = xno || {
-          set -o ${_st_name} 2> /dev/null ||
-            set -${_st_code} || :;
-        } ;;
-      *)
-        # option not supported
-        continue ;;
-    esac
+  for _st_code in 'f' 'e' 'u' 'C'
+  do
+    _st_pat="*[${_st_code}]*"
+    case $st_orig_opts in $_st_pat ) : ;; * ) continue ;; esac
+    case $- in $_st_pat ) continue ;; * ) set "-${_st_code}" ;; esac
   done
 else :
 fi
 
 # cleanup
-{ test ${_st_code+y} && ( (unset '_st_code') || exit 1) >/dev/null 2>&1 && unset '_st_code'; } || :
-{ test ${_st_opts+y} && ( (unset '_st_opts') || exit 1) >/dev/null 2>&1 && unset '_st_opts'; } || :
-{ test ${_st_name+y} && ( (unset '_st_name') || exit 1) >/dev/null 2>&1 && unset '_st_name'; } || :
-{ test ${_st_enabled+y} && ( (unset '_st_enabled') || exit 1) >/dev/null 2>&1 && unset '_st_enabled'; } || :
+st_orig_opts=''; unset 'st_orig_opts'
+_st_opts=''; unset '_st_opts'
+_st_code=''; unset '_st_code'
+_st_pat=''; unset '_st_pat'

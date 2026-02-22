@@ -5,5 +5,5 @@
 # wraps the string in single quotes.
 quote ()
 {
-  printf %s "x${1}x" | sed -e "s/'/'\\\\''/g" -e "1s/^x/'/" -e '$s/x$/'\''/'
+  printf %s "x${*}x" | sed -e "s/'/'\\\\''/g" -e "1s/^x/'/" -e '$s/x$/'\''/'
 }
