@@ -86,7 +86,7 @@ printf "%s\n\n" '#!/bin/sh'
 printf '%s\n' '# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-20260222'
 printf '%s\n' "#   DATE: `date '+%Y-%m-%d'`"
 printf '%s\n' '# SOURCE: https://github.com/Lohann/shell-tools'
-printf '%s\n' '# COMMIT: 20ff623e066e3c5a890df337435bbe0e4432ac29'
+printf '%s\n' '# COMMIT: 0ac9d68b11b66cf6b3136134d34575b823942f20'
 printf '\n'
 printf '%s\n' '# IMPORTED MODULES #'
 printf '%s=' "st_import"
