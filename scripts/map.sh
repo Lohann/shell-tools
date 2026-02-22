@@ -8,6 +8,7 @@ map ()
   test $# -gt 0 || return 1;
   eval "while test \$# -gt 1; do
   shift > /dev/null 2>&1 || return \$?;
-  eval $(printf '%s' "${1}" | sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e "\$s/\$/'/") || return \$?
-done"
+  eval $(printf '%s' "${1}" | sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e '$s/$/'\''/') || return \$?
+done
+return 0"
 }
