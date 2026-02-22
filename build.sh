@@ -111,6 +111,12 @@ test -f './scripts/test_varname.sh' || {
 . './scripts/map.sh'
 . './scripts/test_varname.sh'
 
+# Find 'git' and 'date' commands
+command -v 'git' > /dev/null || \
+{ printf %s\\n "command 'git' not found" >&2; exit 1; }
+command -v 'date' > /dev/null || \
+{ printf %s\\n "command 'date' not found" >&2; exit 1; }
+
 ####################
 ## HELPER METHODS ##
 ####################
@@ -229,14 +235,27 @@ sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
 ${v}
 EOF
 
-sed -e "s/'/'\\\\''/g" -e "\$s/\$/'/" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
+sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
 done
 test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }
 ) || exit $?;
+EOF
 
+sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
+printf "%s\n\n" '#!/bin/sh'
+printf '%s\n' '# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-`date '+%Y%m%d'`'
+printf '%s\n' "#   DATE: \`date '+%Y-%m-%d'\`"
+printf '%s\n' '# SOURCE: https://github.com/Lohann/shell-tools'
+printf '%s\n' '# COMMIT: `git rev-parse HEAD`'
+printf '\n'
+EOF
+
+sed -e "s/'/'\\\\''/g" -e "\$s/\$/'/" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
+printf '%s\n' '# IMPORTED MODULES #'
+printf '%s=' "${1}"
 # display imports
-tr '\n' ' ' <<EOL
-${1}='${${1}}'
+sed -e '$!s/$/ \\/' -e "1s/^/'/" -e '$s/$/'\''/' <<EOL
+${${1}}
 EOL
 printf '\n'
 

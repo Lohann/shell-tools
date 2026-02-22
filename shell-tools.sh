@@ -16,7 +16,9 @@ popvar
 pushvar
 sh_escape
 str_to_varname
-version_compare'
+trim
+version_compare
+'
 
 # Remove whitespaces
 st_import="$(
@@ -73,16 +75,24 @@ case "${a}" in
   'pushvar') : ;;
   'sh_escape') : ;;
   'str_to_varname') : ;;
+  'trim') : ;;
   'version_compare') : ;;
   *) _st_error="${_st_error}unknown option '${a}'${nl}" ;;
 esac;
 done
 test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }
 ) || exit $?;
-
+printf "%s\n\n" '#!/bin/sh'
+printf '%s\n' '# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-20260222'
+printf '%s\n' "#   DATE: `date '+%Y-%m-%d'`"
+printf '%s\n' '# SOURCE: https://github.com/Lohann/shell-tools'
+printf '%s\n' '# COMMIT: 20ff623e066e3c5a890df337435bbe0e4432ac29'
+printf '\n'
+printf '%s\n' '# IMPORTED MODULES #'
+printf '%s=' "st_import"
 # display imports
-tr '\n' ' ' <<EOL
-st_import='${st_import}'
+sed -e '$!s/$/ \\/' -e "1s/^/'/" -e '$s/$/'\''/' <<EOL
+${st_import}
 EOL
 printf '\n'
 
@@ -546,12 +556,12 @@ printf '%s\n' '
 # advantage of any shell optimizations that allow amortized linear growth over
 # repeated appends, instead of the typical quadratic growth present in naive
 # implementations.
-if (eval "as_var=1; as_var+=2; test x\$as_var = x12") 2>/dev/null
-then
+if (eval "st_var=1; st_var+=2; test x\$st_var = x12") 2>/dev/null
+then eval '\''
 '"${append}"' ()
 {
   eval "${1}+=\"\${2}\""
-}
+}'\''
 else
 '"${append}"' ()
 {
@@ -574,7 +584,7 @@ printf '%s\n' '
 # wraps the string in single quotes.
 '"${quote}"' ()
 {
-  printf %s "${1}" | sed -e "s/'\''/'\''\\\\'\'''\''/g" -e "1s/^/'\''/" -e "\$s/\$/'\''/"
+  printf %s "x${1}x" | sed -e "s/'\''/'\''\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''
 }'
 )
 else :
@@ -593,10 +603,11 @@ printf '%s\n' '
 '"${map}"' ()
 {
   test $# -gt 0 || return 1;
-  eval "while test \$# -gt 1; do
-  shift > /dev/null 2>&1 || return \$?;
-  eval $(printf '\''%s'\'' "${1}" | sed -e "s/'\''/'\''\\\\'\'''\''/g" -e "1s/^/'\''/" -e "\$s/\$/'\''/") || return \$?
-done"
+  eval '\''while test $# -gt 1; do
+  shift > /dev/null 2>&1 || return $?;
+  eval '\''"`printf %s "x${1}x" | sed -e "s/'\''/'\''\\\\\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''`"'\''
+done
+return 0'\''
 }'
 )
 else :
@@ -611,14 +622,18 @@ eval "${st_import}"
 printf '%s\n' '
 # valid_varname <STRING>
 # ----------------------
-# Check if <STRING> is a valid shell varname
+# Check all arguments, check if <STRING> is a valid shell varname
 '"${test_varname}"' ()
 {
-  test $# -gt 0 || return 127;
+  test $# -gt 0 || return 127
   while :; do
-    { test -n "${1#[0-9]}" && test "x${1#*[!A-Za-z0-9_]}" = "x${1}"; } || return 1;
-    test $# -gt 1 || return 0;
-    shift 2> /dev/null || return 127;
+    # https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.72/html_node/Special-Shell-Variables.html
+    case ${1} in
+      [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) return 1 ;;
+      [a-zA-Z_]* ) test $# -gt 1 || return 0 ;;
+      * ) return 1 ;;
+    esac
+    shift 2> /dev/null || return 127
   done
 }'
 )
@@ -665,8 +680,8 @@ else :
   # substring is longer than 120 bytes.  So fall back on `printf|sed` if
   # `expr` fails.
   {
-    expr a : '\''\(a\)'\'' >/dev/null 2>&1 &&
-    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 &&
+    expr a : '\''\(a\)'\'' >/dev/null 2>&1 && \
+    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 && \
     expr X/"${1}" : '\''.*/\([^/][^/]*\)/*$'\'' \| \
 	    X"${1}" : '\''X\(//\)$'\'' \| \
 	    X"${1}" : '\''X\(/\)'\'' \| .. 2>/dev/null;
@@ -750,8 +765,8 @@ else :
   # substring is longer than 120 bytes.  So fall back on `printf|sed` if
   # `expr` fails.
   {
-    expr a : '\''\(a\)'\'' >/dev/null 2>&1 &&
-    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 &&
+    expr a : '\''\(a\)'\'' >/dev/null 2>&1 && \
+    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 && \
     expr X"${1}" : '\''X\(.*[^/]\)//*[^/][^/]*/*$'\'' \| \
 	  X"${1}" : '\''X\(//\)[^/]'\'' \| \
 	  X"${1}" : '\''X\(//\)$'\'' \| \
@@ -790,16 +805,29 @@ eval "${st_import}"
 printf '%s\n' '
 # popvar <VAR>
 # ----------------------
-# push the value at <VAR> into stack.
+# pops a value from the stack and assign it to <VAR>
 '"${popvar}"' ()
 {
   while test $# -gt 0; do
-    { test -n "${1#[0-9]}" && test "x${1#*[!A-Za-z0-9_]}" = "x${1}"; } || return 1;
-    eval "test \"\${${1}_level:-0}\" -gt 0 && \
-${1}_level=\$((\${${1}_level}-1)) && \
-eval \"${1}=\\\"\\\${${1}_\${${1}_level}:-}\\\"\" && \
-unset \"${1}_\${${1}_level}\"" || return $?;
-    shift 2> /dev/null || return $?;
+    # Check stack varname
+    case ${1} in
+      [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
+        printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
+      [a-zA-Z_]* ) :
+        eval "test \"\${${1}_level:-0}\" -ge 0" > /dev/null || \
+        { printf %s\\n "not a stack '\''${1}'\''" >&2; return 127; } ;;
+      * ) printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
+    esac
+    # check if the stack is empty
+    eval "test \"\${${1}_level:-0}\" -gt 0" || return 1
+    # decrement stack level
+    eval "${1}_level=\$(( \${${1}_level} - 1 ))" || return 127
+    # assign stack item to ${1}
+    eval "eval \"${1}=\\\"\\\${${1}_\${${1}_level}:=}\\\"\""
+    # unset stack value
+    eval "unset \"${1}_\${${1}_level}\"" 2> /dev/null || :
+    test $# -gt 1 || return 0
+    shift 2> /dev/null || return $?
   done
 }'
 )
@@ -815,16 +843,28 @@ eval "${st_import}"
 printf '%s\n' '
 # pushvar <VAR>
 # ----------------------
-# decrement <VAR>_LEVEL and assign <VAR>_<LEVEL> to <VAR>
+# push a value into the stack <VAR>, if the stack doesn'\''t exists, create one.
 '"${pushvar}"' ()
 {
   while test $# -gt 0; do
-    { test -n "${1#[0-9]}" && test "x${1#*[!A-Za-z0-9_]}" = "x${1}"; } || return 1;
-    eval "test \${${1}+x} && \\
-test \"\${${1}_level:=0}\" -ge 0 && \\
-eval \"${1}_\${${1}_level}=\\\"\\\${${1}}\\\"\" && \\
-${1}_level=\$((\${${1}_level}+1))" || return $?;
-    shift 2> /dev/null || return $?;
+    # Check stack varname
+    case ${1} in
+      [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
+        printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
+      [a-zA-Z_]* ) :
+        eval "test \${${1}+y}" 2> /dev/null || \
+        { printf %s\\n "'\''${1}'\'' is undefined" >&2; return 127; } ;;
+      * ) printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
+    esac
+    # check stack level
+    eval "test \"\${${1}_level:=0}\" -ge 0" 2> /dev/null || \
+    { printf %s\\n "invalid '\''${1}_level'\'': not an integer" >&2; return 127; }
+    # assign value to stack
+    eval "eval \"${1}_\${${1}_level}=\\\"\\\${${1}}\\\"\"" || return 127
+    # increment stack level
+    eval "${1}_level=\$(( 1 + \${${1}_level} ))" || return 127
+    test $# -gt 1 || return 0
+    shift 2> /dev/null || return 127
   done
 }'
 )
@@ -850,15 +890,23 @@ ${1}
 EOF
     then printf %s "${1}"
     else
-      printf %s "${1}" | \
+      printf %s "x${1}x" | \
       sed \
+        -n \
+        -e '\'':begin'\'' \
+        -e '\''$bend'\'' \
+        -e '\''N'\'' \
+        -e '\''bbegin'\'' \
+        -e '\'':end'\'' \
         -e "s/'\''/'\''\\\\'\'''\''/g" \
-        -e "1s/^/'\''/" \
-        -e "\$s/\$/'\''/" \
-        -e "s#^'\''\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\''\2#"
+        -e "s/^x/'\''/" \
+        -e '\''s/x$/'\''\'\'''\''/'\'' \
+        -e "s#^'\''\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\''\2#" \
+        -e '\''p'\''
     fi
-    shift 2> /dev/null || return $?;
-    test $# -eq 0 || printf %s '\'' '\''
+    test $# -gt 1 || return 0
+    shift 2> /dev/null || return $?
+    printf %s '\'' '\''
   done
 }'
 )
@@ -886,6 +934,34 @@ printf '%s\n' '
 else :
 fi
 
+## trim ##
+if grep '^trim' >/dev/null 2>&1 <<EOL
+${st_import}
+EOL
+then (
+eval "${st_import}"
+printf '%s\n' '
+# trim <STRING>
+# ---------------------
+# Removes blank characters [ \t\n\r\f\v] from both ends of this string
+'"${trim}"' ()
+{
+  printf '\''%s'\'' "$*" | \
+  sed \
+    -n \
+    -e '\'':begin'\'' \
+    -e '\''$bend'\'' \
+    -e '\''N'\'' \
+    -e '\''bbegin'\'' \
+    -e '\'':end'\'' \
+    -e '\''s/^[[:space:]]*//'\'' \
+    -e '\''s/[[:space:]]*$//'\'' \
+    -e '\''p'\''
+}'
+)
+else :
+fi
+
 ## version_compare ##
 if grep '^version_compare' >/dev/null 2>&1 <<EOL
 ${st_import}
@@ -899,7 +975,6 @@ printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Softwa
 # original code:
 # https://github.com/autotools-mirror/autoconf/blob/v2.72/lib/m4sugar/m4sh.m4#L1742-L1805
 
-
 # version_compare <VERSION_1> <OP> <VERSION_2>
 # ----------------------------------------------------------------------------
 # Compare two strings possibly containing shell variables as version strings.
@@ -907,6 +982,7 @@ printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Softwa
 #  -        LESS THAN: '\''-lt'\'' '\''<'\'' 
 #  -    LESS OR EQUAL: '\''-le'\'' '\''<='\'' 
 #  -            EQUAL: '\''-eq'\'' '\''='\'' '\''=='\'' 
+#  -        NOT EQUAL: '\''-ne'\'' '\''!='\''
 #  - GREATER OR EQUAL: '\''-ge'\'' '\''>='\'' 
 #  -     GREATER THAN: '\''-gt'\'' '\''>'\'' 
 #
@@ -914,95 +990,114 @@ printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Softwa
 # so don'\''t worry about finding a "nice" awk version.
 '"${version_compare}"' ()
 {
-  test $# -eq 3 || return 127;
-  case "${2}" in
-    -lt|'\''<'\'') : ;;
-    -le|'\''<='\'') : ;;
-    -eq|'\''='\''|'\''=='\'') : ;;
-    -ge|'\''>='\'') : ;;
-    -gt|'\''>'\'') : ;;
-    *) printf %s\\n "unknown operator '\''${2}'\''" >&2; return 127 ;;
-  esac
-  
-  # test AWK
-  ( { awk '\''BEGIN { exit 0 }'\'' && awk '\''BEGIN { exit 123 }'\''; }; test $? -eq 123; ) > /dev/null 2>&1 || return 127;
+  test $# -eq 3 || { printf '\''%s\n'\'' "usage: version_compare <V1> [-eq|-ne|-gt|-ge|-lt|-le] <V2>
+expected 3 arguments, provided $#" >&2; return 127; }
 
-  # execute awk in a `if` statement, so it doesn'\''t exit when errexit `-e` is enabled.
-  if LANGUAGE=C LC_ALL=C awk '\''# Use only awk features that work with 7th edition Unix awk (1978).
-  # My, what an old awk you have, Mr. Solaris!
-  END {
-    while (length(v1) && length(v2)) {
-      # Set d1 to be the next thing to compare from v1, and likewise for d2.
-      # Normally this is a single character, but if v1 and v2 contain digits,
-      # compare them as integers and fractions as strverscmp does.
-      if (v1 ~ /^[0-9]/ && v2 ~ /^[0-9]/) {
-	# Split v1 and v2 into their leading digit string components d1 and d2,
-	# and advance v1 and v2 past the leading digit strings.
-	for (len1 = 1; substr(v1, len1 + 1) ~ /^[0-9]/; len1++) continue
-	for (len2 = 1; substr(v2, len2 + 1) ~ /^[0-9]/; len2++) continue
-	d1 = substr(v1, 1, len1); v1 = substr(v1, len1 + 1)
-	d2 = substr(v2, 1, len2); v2 = substr(v2, len2 + 1)
-	if (d1 ~ /^0/) {
-	  if (d2 ~ /^0/) {
-	    # Compare two fractions.
-	    while (d1 ~ /^0/ && d2 ~ /^0/) {
-	      d1 = substr(d1, 2); len1--
-	      d2 = substr(d2, 2); len2--
-	    }
-	    if (len1 != len2 && ! (len1 && len2 && substr(d1, 1, 1) == substr(d2, 1, 1))) {
-	      # The two components differ in length, and the common prefix
-	      # contains only leading zeros.  Consider the longer to be less.
-	      d1 = -len1
-	      d2 = -len2
-	    } else {
-	      # Otherwise, compare as strings.
-	      d1 = "x" d1
-	      d2 = "x" d2
-	    }
-	  } else {
-	    # A fraction is less than an integer.
-	    exit 1
-	  }
-	} else {
-	  if (d2 ~ /^0/) {
-	    # An integer is greater than a fraction.
-	    exit 2
-	  } else {
-	    # Compare two integers.
-	    d1 += 0
-	    d2 += 0
-	  }
-	}
+  # Internaly all operators are converted to integers with prime factors
+  # 2, 3 and 5, it reduces the amount of logic necessary to evaluate all
+  # combinations of expressions and operators.
+  # Each basic operator is represent as an unique prime number:
+  # -lt = 2
+  # -gt = 3
+  # -eq = 5
+  # Other operators are product of basic operators:
+  # -le = -lt || -eq == 2 * 5 == 10
+  # -ge = -gt || -eq == 3 * 5 == 15
+  # -ne = -lt || -gt == 2 * 3 == 6
+  # Then compute N by comparing v1 and v2 as follow:
+  # N = 2 when v1 < v2
+  # N = 3 when v1 > v2
+  # N = 5 when v1 = v2
+  # The exit status is OPERATOR % N, which correctly evaluates to zero
+  # when the expression is true, and non-zero when the expression is false.
+  LANGUAGE=C LC_ALL=C awk '\''
+# Use only awk features that work with 7th edition Unix awk (1978).
+# My, what an old awk you have, Mr. Solaris!
+END {
+  # exit status 7 if operator is invalid.
+  op = 0
+  if (length(v0) == 1) {
+    if (v0 ~ /^</) { op = 2 }
+    if (v0 ~ /^>/) { op = 3 }
+    if (v0 ~ /^=/) { op = 5 }
+  } else {
+  if (length(v0) == 2) {
+    if (v0 ~ /^==/) { op = 5 }
+    if (v0 ~ /^!=/) { op = 6 }
+    if (v0 ~ /^<=/) { op = 10 }
+    if (v0 ~ /^>=/) { op = 15 }
+  } else {
+  if (length(v0) == 3) {
+    if (v0 ~ /^-lt/) { op = 2 }
+    if (v0 ~ /^-le/) { op = 10 }
+    if (v0 ~ /^-eq/) { op = 5 }
+    if (v0 ~ /^-ne/) { op = 6 }
+    if (v0 ~ /^-ge/) { op = 15 }
+    if (v0 ~ /^-gt/) { op = 3 }
+  } else { exit 7 }}}
+  if (length(v0) && op) { op += 0 } else { exit 7 }
+  while (length(v1) && length(v2)) {
+    # Set d1 to be the next thing to compare from v1, and likewise for d2.
+    # Normally this is a single character, but if v1 and v2 contain digits,
+    # compare them as integers and fractions as strverscmp does.
+    if (v1 ~ /^[0-9]/ && v2 ~ /^[0-9]/) {
+      # Split v1 and v2 into their leading digit string components d1 and d2,
+      # and advance v1 and v2 past the leading digit strings.
+      for (len1 = 1; substr(v1, len1 + 1) ~ /^[0-9]/; len1++) continue
+      for (len2 = 1; substr(v2, len2 + 1) ~ /^[0-9]/; len2++) continue
+      d1 = substr(v1, 1, len1); v1 = substr(v1, len1 + 1)
+      d2 = substr(v2, 1, len2); v2 = substr(v2, len2 + 1)
+      if (d1 ~ /^0/) {
+        if (d2 ~ /^0/) {
+          # Compare two fractions.
+          while (d1 ~ /^0/ && d2 ~ /^0/) {
+            d1 = substr(d1, 2); len1--
+            d2 = substr(d2, 2); len2--
+          }
+          if (len1 != len2 && ! (len1 && len2 && substr(d1, 1, 1) == substr(d2, 1, 1))) {
+            # The two components differ in length, and the common prefix
+            # contains only leading zeros.  Consider the longer to be less.
+            d1 = -len1
+            d2 = -len2
+          } else {
+            # Otherwise, compare as strings.
+            d1 = "x" d1
+            d2 = "x" d2
+          }
+        } else {
+          # A fraction is less than an integer.
+          exit (op % 2)
+        }
       } else {
-	# The normal case, without worrying about digits.
-	d1 = substr(v1, 1, 1); v1 = substr(v1, 2)
-	d2 = substr(v2, 1, 1); v2 = substr(v2, 2)
+        if (d2 ~ /^0/) {
+          # An integer is greater than a fraction.
+          exit (op % 3)
+        } else {
+          # Compare two integers.
+          d1 += 0
+          d2 += 0
+        }
       }
-      if (d1 < d2) exit 1
-      if (d1 > d2) exit 2
+    } else {
+      # The normal case, without worrying about digits.
+      d1 = substr(v1, 1, 1); v1 = substr(v1, 2)
+      d2 = substr(v2, 1, 1); v2 = substr(v2, 2)
     }
-    # Beware Solaris 11 /usr/xgp4/bin/awk, which mishandles some
-    # comparisons of empty strings to integers.  For example,
-    # LC_ALL=C /usr/xpg4/bin/awk "BEGIN {if (-1 < \"\") print \"a\"}"
-    # prints "a".
-    if (length(v2)) exit 1
-    if (length(v1)) exit 2
+    if (d1 < d2) { exit (op % 2) }
+    if (d1 > d2) { exit (op % 3) }
   }
-'\''  v1="${1}" v2="${3}" /dev/null
-  then :
-  else
-    # else body cannot be empty, we can'\''t use '\'':'\'' because it would trash the value of $?.
-    # Instead we use '\''case e in e) <BODY> ;; esac'\'' which is valid even when <BODY> is empty.
-    case e in e) ;; esac;
-  fi
-  # exit status 1 means $v1 < $v2
-  # exit status 0 means $v1 = $v2
-  # exit status 2 means $v1 > $v2
+  # Beware Solaris 11 /usr/xgp4/bin/awk, which mishandles some
+  # comparisons of empty strings to integers.  For example,
+  # LC_ALL=C /usr/xpg4/bin/awk "BEGIN {if (-1 < \"\") print \"a\"}"
+  # prints "a".
+  if (length(v2)) { exit (op % 2) }
+  if (length(v1)) { exit (op % 3) }
+  exit (op % 5)
+}'\'' v0="${2}" v1="${1}" v2="${3}" /dev/null || \
   case $? in
-    1) case "$2" in -lt|-le|'\''<'\''|'\''<='\'') return 0 ;; *) return 1 ;; esac ;;
-    0) case "$2" in -eq|-le|-ge|'\''='\''|'\''=='\''|'\''>='\''|'\''<='\'') return 0 ;; *) return 1 ;; esac ;;
-    2) case "$2" in -gt|-ge|'\''>'\''|'\''>='\'') return 0 ;; *) return 2 ;; esac ;;
-    *) return 127; ;;
+    7 ) printf %s\\n "invalid operator '\''${2}'\''" >&2; return 7 ;;
+    [123456] ) return 1 ;;
+    * ) return 127 ;;
   esac
 }'
 )
