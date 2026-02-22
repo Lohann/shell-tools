@@ -33,8 +33,8 @@ basename ()
   # substring is longer than 120 bytes.  So fall back on `printf|sed` if
   # `expr` fails.
   {
-    expr a : '\(a\)' >/dev/null 2>&1 &&
-    test "X`expr 00001 : '.*\(...\)'`" = X001 >/dev/null 2>&1 &&
+    expr a : '\(a\)' >/dev/null 2>&1 && \
+    test "X`expr 00001 : '.*\(...\)'`" = X001 >/dev/null 2>&1 && \
     expr X/"${1}" : '.*/\([^/][^/]*\)/*$' \| \
 	    X"${1}" : 'X\(//\)$' \| \
 	    X"${1}" : 'X\(/\)' \| .. 2>/dev/null;
