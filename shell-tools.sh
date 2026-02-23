@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-396c9b7
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-0750b26
 # COMMAND: ./build.sh --import=st_import --output=./shell-tools.sh
 #    DATE: 2026-02-23
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: fc8c47c87b88067bad014559a41ae93bbc1e2fd6664e5d205d25a03f560c000f
+#  SHA256: e0b1d69c50cd1a8ec3847bf18476269af331875d09ba57c1eb5edb6d850f363e
 
 ##################
 ## SCRIPT START ##
@@ -83,10 +83,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-396c9b7
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-0750b26
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: fc8c47c87b88067bad014559a41ae93bbc1e2fd6664e5d205d25a03f560c000f
+# SHA256: e0b1d69c50cd1a8ec3847bf18476269af331875d09ba57c1eb5edb6d850f363e
 
 EOLHEADER
 
