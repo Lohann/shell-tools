@@ -59,6 +59,7 @@ _scripts='./scripts/bourne_compatible.sh
 ./scripts/shell_sanitize.sh
 ./scripts/append.sh
 ./scripts/quote.sh
+./scripts/sh_escape.sh
 ./scripts/map.sh
 ./scripts/test_varname.sh
 ./scripts/basename.sh
@@ -143,12 +144,8 @@ _st_import()
   append "${1}" "\
 
 ## ${2} ##
-if grep '^${2}' >/dev/null 2>&1 <<EOL
-\${${1}}
-EOL
-then (eval \"\${${1}}\"; printf '%s\n' `_st_quote_file "${2}" "${2}" "${3}" 2>&1`)
-else :
-fi
+echo \"\${${1}}\" | grep '^${2}' >/dev/null 2>&1 &&
+(eval \"\${${1}}\"; printf '%s\n' `_st_quote_file "${2}" "${2}" "${3}" 2>&1`) || :
 "
 }
 
@@ -189,57 +186,61 @@ ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C sed -n \
 test "X${${1}}" != X || exit 0
 
 # Validate options
-(_imports="${${1}}";
-_st_error='';
-st_test='['\'']*'
-for v in ${_imports};
-do
-case "${v}" in 
-  $st_test ) eval "_st_error=\"\${_st_error}invalid option \"${v}'
-'"; continue ;;
-  *=* ) a="${v%%[=]*}" ;;
-  * ) a="${v}" ;;
-esac
 EOF
 
-v='case "${a}" in
-'
+v="_imports=\"\${\${1}}\"
+_st_error=""
+st_case='['\'']*'
+for v in \${_imports}
+do case \${v} in
+  \$st_case ) eval \"_st_error=\\\"\\\${_st_error}invalid option \\\"\${v}'
+'\"; continue ;;
+  *=* ) a=\"\${v%%[=]*}\" ;;
+  * ) a=\"\${v}\" ;;
+esac
+case \"\${a}\" in
+"
 map "append v \"  \`expr \"X\${1}\" ':' '.\\([^=][^=]*\\)=.*$'\` ) : ;;
 \"" ${_scripts}
 
 append 'v' '  * ) _st_error="${_st_error}unknown option '\''${a}'\''
 " ;;
-'
-append 'v' 'esac'
-sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
-${v}
-EOF
-
-sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
+esac
 done
-test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }) ||
-exit $?;
+test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_error}" >&2; exit 1; }'
+
+v=`quote "${v}"`
+v="(eval ${v}) || exit \$?"
+sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
+${v} 
+
 EOF
 
+eval "v=\"\${${1}_version}\""
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
-printf "%s\n\n" '#!/bin/sh'
-printf '%s\n' '# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-`date '+%Y%m%d'`'
-printf '%s\n' "#   DATE: \`date '+%Y-%m-%d'\`"
-printf '%s\n' '# SOURCE: https://github.com/Lohann/shell-tools'
-printf '%s\n' '# COMMIT: `git rev-parse HEAD`'
-printf '\n'
+# display file header
+cat <<EOLHEADER
+#!/bin/sh
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS ${v}
+#   DATE: \`TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'\`
+# SOURCE: https://github.com/Lohann/shell-tools
+# SHA256: \${${1}_hash}
+
+EOLHEADER
+
 EOF
 
 sed -e "s/'/'\\\\''/g" -e "\$s/\$/'/" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
-printf '%s\n' '# IMPORTED MODULES #'
-printf '%s=' "${1}"
 # display imports
-sed -e "1s/^/'/" -e '$s/$/'\''/' <<EOL
-${${1}}
-EOL
-printf '\n'
+printf '%s\n' '# IMPORTED MODULES #'
+printf '%s\n' "${1}='${${1}}'"
 
 EOF
+}
+
+_st_try_eval ()
+{
+  eval "$@" || { s=$?; printf '%s\n%s\n' "[ERROR] eval failed ${s}:" "$*" >&2; exit 1; }
 }
 
 # _st_build <VARNAME>
@@ -247,18 +248,43 @@ EOF
 # build the 'shell-tools.sh' and assign it to <VARNAME>
 _st_build()
 {
+  set -eu
   test_varname "${1}" ||
   { printf %s\\n "invalid variable name '${1}'" >&2; exit 1; }
-  eval "${1}='#!/bin/sh
+  eval "${1}_rev=\`git rev-parse --short HEAD\`"
+  eval "${1}_version=\"v0.1.0-\${${1}_rev}\""
+  eval "${1}_date=\`TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'\`"
+  eval "${1}_cmd=''"
+  append "${1}_cmd" "`sh_escape "${_st_myself}" "--import=${1}" "--output=${_st_output}"`"
 
-'"
-  eval "append '${1}' $(_st_header)" || { printf %s\\n "eval failed" >&2; exit 1; }
-  map '_st_import '"'${1}'"' `expr "X${1}" ":" '\''.\([^=][^=]*\)=.*$'\''` `expr "X${1}" ":" '\''.[^=][^=]*=\(.*\)$'\''`' \
-  ${_scripts}
+  eval "${1}=''"
+  eval "append '${1}' `_st_header "${1}"`"
+  map '_st_import '"'${1}'"' `expr "X${1}" ":" '\''.\([^=][^=]*\)=.*$'\''` `expr "X${1}" ":" '\''.[^=][^=]*=\(.*\)$'\''`' ${_scripts}
+
   append "${1}" "
 # cleanup
-${1}=; unset '${1}';
+${1}=''; unset '${1}';
 "
+
+  eval "${1}_hash=\`printf %s \"\${${1}}\" | sha256\`"
+  eval "${1}_header='#!/bin/sh
+
+'"
+  eval "append '${1}_header' \"# FILE AUTO-GENERATED USING SHELL-TOOLS \${${1}_version}
+\""
+  eval "append '${1}_header' \"# COMMAND: \${${1}_cmd}
+\""
+  eval "append '${1}_header' \"#    DATE: \${${1}_date}
+\""
+  eval "append '${1}_header' \"#  SOURCE: https://github.com/Lohann/shell-tools
+\""
+  eval "append '${1}_header' \"#  SHA256: \${${1}_hash}
+\""
+  eval "append '${1}_header' \"
+\${${1}}\""
+  eval "${1}=\`printf %s \"\${${1}_header}\" | sed \
+    -e 's/\\\${${1}_hash}/'\"\${${1}_hash}\"'/g'\`"
+  eval "unset '${1}_header'"
 }
 
 # show_help
@@ -397,7 +423,8 @@ set -f
 v=''; unset 'v'
 
 # 9. Merge all scripts
-_st_body="$(eval "_st_build '${_st_import}' > /dev/null 2>&1 && printf '%s\n' \"\${${_st_import}}\"")"
+_st_body="$(eval "_st_build '${_st_import}' >&2 && printf '%s\n' \"\${${_st_import}}\"")"
+
 
 # 10. Write to var `_st_body` to output.
 case "${_st_output}" in

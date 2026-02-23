@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-396c9b7
+# COMMAND: ./build.sh --import=st_import --output=./shell-tools.sh
+#    DATE: 2026-02-23
+#  SOURCE: https://github.com/Lohann/shell-tools
+#  SHA256: fc8c47c87b88067bad014559a41ae93bbc1e2fd6664e5d205d25a03f560c000f
+
 ##################
 ## SCRIPT START ##
 ##################
@@ -7,6 +13,7 @@ test x"${st_import:-}" != 'x' || st_import='bourne_compatible
 shell_sanitize
 append
 quote
+sh_escape
 map
 test_varname
 basename
@@ -14,7 +21,6 @@ pushvar
 popvar
 clean_dir
 dirname
-sh_escape
 str_to_varname
 trim
 unix_timestamp
@@ -41,14 +47,13 @@ st_import=`printf '%s\n' "${st_import}" | LC_ALL=C LANGUAGE=C sed -n \
 test "X${st_import}" != X || exit 0
 
 # Validate options
-(_imports="${st_import}";
-_st_error='';
-st_test='['\'']*'
-for v in ${_imports};
-do
-case "${v}" in 
-  $st_test ) eval "_st_error=\"\${_st_error}invalid option \"${v}'
-'"; continue ;;
+(eval '_imports="${st_import}"
+_st_error=
+st_case='\''['\''\'\'''\'']*'\''
+for v in ${_imports}
+do case ${v} in
+  $st_case ) eval "_st_error=\"\${_st_error}invalid option \"${v}'\''
+'\''"; continue ;;
   *=* ) a="${v%%[=]*}" ;;
   * ) a="${v}" ;;
 esac
@@ -57,6 +62,7 @@ case "${a}" in
   shell_sanitize ) : ;;
   append ) : ;;
   quote ) : ;;
+  sh_escape ) : ;;
   map ) : ;;
   test_varname ) : ;;
   basename ) : ;;
@@ -64,36 +70,33 @@ case "${a}" in
   popvar ) : ;;
   clean_dir ) : ;;
   dirname ) : ;;
-  sh_escape ) : ;;
   str_to_varname ) : ;;
   trim ) : ;;
   unix_timestamp ) : ;;
   version_compare ) : ;;
-  * ) _st_error="${_st_error}unknown option '${a}'
+  * ) _st_error="${_st_error}unknown option '\''${a}'\''
 " ;;
 esac
 done
-test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }) ||
-exit $?;
-printf "%s\n\n" '#!/bin/sh'
-printf '%s\n' '# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-20260223'
-printf '%s\n' "#   DATE: `date '+%Y-%m-%d'`"
-printf '%s\n' '# SOURCE: https://github.com/Lohann/shell-tools'
-printf '%s\n' '# COMMIT: 71606557897b5b55ee10223b7941d8482f4598f0'
-printf '\n'
-printf '%s\n' '# IMPORTED MODULES #'
-printf '%s=' "st_import"
+test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_error}" >&2; exit 1; }') || exit $? 
+
+# display file header
+cat <<EOLHEADER
+#!/bin/sh
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-396c9b7
+#   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
+# SOURCE: https://github.com/Lohann/shell-tools
+# SHA256: fc8c47c87b88067bad014559a41ae93bbc1e2fd6664e5d205d25a03f560c000f
+
+EOLHEADER
+
 # display imports
-sed -e "1s/^/'/" -e '$s/$/'\''/' <<EOL
-${st_import}
-EOL
-printf '\n'
+printf '%s\n' '# IMPORTED MODULES #'
+printf '%s\n' "st_import='${st_import}'"
 
 ## bourne_compatible ##
-if grep '^bourne_compatible' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+echo "${st_import}" | grep '^bourne_compatible' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -401,15 +404,11 @@ fi
 st_orig_opts='\'''\''; unset '\''st_orig_opts'\''
 _st_opts='\'''\''; unset '\''_st_opts'\''
 _st_code='\'''\''; unset '\''_st_code'\''
-_st_pat='\'''\''; unset '\''_st_pat'\''')
-else :
-fi
+_st_pat='\'''\''; unset '\''_st_pat'\''') || :
 
 ## shell_sanitize ##
-if grep '^shell_sanitize' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+echo "${st_import}" | grep '^shell_sanitize' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -460,15 +459,11 @@ then :
 else
   echo shell doesn\'\''t support '\''test -x <file>'\'' >&2;
   exit 3;
-fi')
-else :
-fi
+fi') || :
 
 ## append ##
-if grep '^append' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^append' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # append VAR VALUE
 # ----------------------
 # Append the text in VALUE to the end of the definition contained in VAR. Take
@@ -484,30 +479,57 @@ else '"${append}"' ()
 {
   eval "${1}=\"\${${1}}\${2}\""
 }
-fi')
-else :
-fi
+fi') || :
 
 ## quote ##
-if grep '^quote' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^quote' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # quote <STRING>
 # ----------------------
 # wraps the string in single quotes.
 '"${quote}"' ()
 {
   printf %s "x${*}x" | sed -e "s/'\''/'\''\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''
-}')
-else :
-fi
+}') || :
+
+## sh_escape ##
+echo "${st_import}" | grep '^sh_escape' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
+# sh_escape [...ARGS]
+# ----------------------
+# Escape and quote the provided arguments, the printed string
+# string can be safely evaluated by shell.
+'"${sh_escape}"' ()
+{
+  while test $# -gt 0; do
+    if tr '\''\n'\'' '\'' '\'' <<EOF | grep '\''^[-[:alnum:]_=,./:]* $'\'' >/dev/null 2>&1
+${1}
+EOF
+    then printf %s "${1}"
+    else
+      printf %s "x${1}x" | \
+      sed \
+        -n \
+        -e '\'':begin'\'' \
+        -e '\''$bend'\'' \
+        -e '\''N'\'' \
+        -e '\''bbegin'\'' \
+        -e '\'':end'\'' \
+        -e "s/'\''/'\''\\\\'\'''\''/g" \
+        -e "s/^x/'\''/" \
+        -e '\''s/x$/'\''\'\'''\''/'\'' \
+        -e "s#^'\''\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\''\2#" \
+        -e '\''p'\''
+    fi
+    test $# -gt 1 || return 0
+    shift 2> /dev/null || return $?
+    printf %s '\'' '\''
+  done
+}') || :
 
 ## map ##
-if grep '^map' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^map' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # map <CODE> [...VALUE]
 # ----------------------
 # Assign each <VALUE> to $1 and eval <CODE>.
@@ -519,15 +541,11 @@ then (eval "${st_import}"; printf '%s\n' '
   eval `printf '\''%s\n'\'' "x${1}x" | sed -e "s/'\''/'\''\\\\\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''`
 done
 return 0"
-}')
-else :
-fi
+}') || :
 
 ## test_varname ##
-if grep '^test_varname' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^test_varname' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # valid_varname <STRING>
 # ----------------------
 # Check all arguments, check if <STRING> is a valid shell varname
@@ -543,15 +561,11 @@ then (eval "${st_import}"; printf '%s\n' '
     esac
     shift 2> /dev/null || return 127
   done
-}')
-else :
-fi
+}') || :
 
 ## basename ##
-if grep '^basename' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+echo "${st_import}" | grep '^basename' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -603,15 +617,11 @@ else :
 	    }
 	    s/.*/./; q'\''; }
 }
-fi')
-else :
-fi
+fi') || :
 
 ## pushvar ##
-if grep '^pushvar' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^pushvar' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # pushvar <VAR>
 # ----------------------
 # push a value into the stack <VAR>, if the stack doesn'\''t exists, create one.
@@ -637,15 +647,11 @@ then (eval "${st_import}"; printf '%s\n' '
     test $# -gt 1 || return 0
     shift 2> /dev/null || return 127
   done
-}')
-else :
-fi
+}') || :
 
 ## popvar ##
-if grep '^popvar' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^popvar' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # popvar <VAR>
 # ----------------------
 # pops a value from the stack and assign it to <VAR>
@@ -672,15 +678,11 @@ then (eval "${st_import}"; printf '%s\n' '
     test $# -gt 1 || return 0
     shift 2> /dev/null || return $?
   done
-}')
-else :
-fi
+}') || :
 
 ## clean_dir ##
-if grep '^clean_dir' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^clean_dir' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # clean_dir <DIR>
 # ------------------
 # Remove all contents from within DIR, including any unwritable
@@ -698,8 +700,7 @@ then (eval "${st_import}"; printf '%s\n' '
     *f* ) printf '\''%s\n'\'' "pathname expansion is disabled, please enable it '\''set +f'\''" >&2; return 127 ;;
     * ) : ;;
   esac
-  (
-  cd "${1}" || return 127
+  (cd "${1}" || return 127
   set x .[!.]* && shift || return 127
   test ! -f "${1}" || return 0
   set x ..?*  && shift || return 127
@@ -707,20 +708,16 @@ then (eval "${st_import}"; printf '%s\n' '
   set x * && shift || return 127
   test ! -f "${1}" || return 0
   shift || return 127
-  return 7
-  ) || case $? in 7 ) return 0 ;; * ) return 127 ;; esac
+  return 7;) ||
+  case $? in 7 ) return 0 ;; * ) return 127 ;; esac
   
   find "${1}" -type d ! -perm -700 -exec chmod u+rwx {} \; || :
   rm -fr "${1}"* "${1}".[!.] "${1}".??*
-}')
-else :
-fi
+}') || :
 
 ## dirname ##
-if grep '^dirname' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+echo "${st_import}" | grep '^dirname' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -774,57 +771,13 @@ else '"${dirname}"' ()
 	    s//\1/
 	    q
 	  }
-	  s/.*/./; q'\'';
-  };
+	  s/.*/./; q'\''; }
 }
-fi')
-else :
-fi
-
-## sh_escape ##
-if grep '^sh_escape' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
-# sh_escape [...ARGS]
-# ----------------------
-# Escape and quote the provided arguments, the printed string
-# string can be safely evaluated by shell.
-'"${sh_escape}"' ()
-{
-  while test $# -gt 0; do
-    if tr '\''\n'\'' '\'' '\'' <<EOF | grep '\''^[-[:alnum:]_=,./:]* $'\'' >/dev/null 2>&1
-${1}
-EOF
-    then printf %s "${1}"
-    else
-      printf %s "x${1}x" | \
-      sed \
-        -n \
-        -e '\'':begin'\'' \
-        -e '\''$bend'\'' \
-        -e '\''N'\'' \
-        -e '\''bbegin'\'' \
-        -e '\'':end'\'' \
-        -e "s/'\''/'\''\\\\'\'''\''/g" \
-        -e "s/^x/'\''/" \
-        -e '\''s/x$/'\''\'\'''\''/'\'' \
-        -e "s#^'\''\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\''\2#" \
-        -e '\''p'\''
-    fi
-    test $# -gt 1 || return 0
-    shift 2> /dev/null || return $?
-    printf %s '\'' '\''
-  done
-}')
-else :
-fi
+fi') || :
 
 ## str_to_varname ##
-if grep '^str_to_varname' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^str_to_varname' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # valid_varname <STRING>
 # ----------------------
 # Transform <STRING> into a valid shell variable name.
@@ -834,15 +787,11 @@ then (eval "${st_import}"; printf '%s\n' '
 
   # Avoid depending upon Character Ranges.
   printf '\''%s\n'\'' "${1}" | sed '\''y%*+%pp%;s%[^_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]%_%g'\''
-}')
-else :
-fi
+}') || :
 
 ## trim ##
-if grep '^trim' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^trim' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # trim <STRING>
 # ---------------------
 # Removes blank characters [ \t\n\r\f\v] from both ends of this string
@@ -859,15 +808,11 @@ then (eval "${st_import}"; printf '%s\n' '
     -e '\''s/^[[:space:]]*//'\'' \
     -e '\''s/[[:space:]]*$//'\'' \
     -e '\''p'\''
-}')
-else :
-fi
+}') || :
 
 ## unix_timestamp ##
-if grep '^unix_timestamp' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '
+echo "${st_import}" | grep '^unix_timestamp' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
 # Sadly `date +%s` is not portable.
 # The only magic number in here is 135140, the number of days between
 # 1600-01-01 and 1970-01-01 treating both as Gregorian dates. 1600 is
@@ -897,15 +842,11 @@ else '"${unix_timestamp}"' ()
 eval "${d}" 2> /dev/null && \
 expr \( \( $y \- 1600 \) \* 365 \+ \( $y \- 1600 \) \/ 4 \- \( $y \- 1600 \) \/ 100 \+ \( $y \- 1600 \) \/ 400 \+ $j \- 1000 \- 135140 \) \* 86400 \+ \( $h \- 100 \) \* 3600 \+ \( $m \- 100 \) \* 60 \+ \( $s \- 100 \))
 }
-fi # unix_timestamp')
-else :
-fi
+fi # unix_timestamp') || :
 
 ## version_compare ##
-if grep '^version_compare' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+echo "${st_import}" | grep '^version_compare' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -1036,9 +977,7 @@ END {
     [123456] ) return 1 ;;
     * ) return 127 ;;
   esac
-}')
-else :
-fi
+}') || :
 
 # cleanup
-st_import=; unset 'st_import';
+st_import=''; unset 'st_import';
