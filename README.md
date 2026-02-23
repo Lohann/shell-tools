@@ -7,13 +7,14 @@ Collection of portable shell scripts,
 - **Compatible**: Don't rely on any non-portable builtins, by default use portable code known to work in any modern posix shell, usage of environemnt specific features or commands are allowed only when there's an equivalent portable alternative (probably slower).
 - **System Agnostic:** Must work in any posix compliant operating system, including **Linux**, **MacOS**, **Windows WSL**, etc...
 
-## Shell-Tools Code Style Guidelines
+## Code Style Guidelines
 ### Functions 
-A script must define functions with the same name as the script file, the script code must never rely on the name of function to be unchanged, because the `build.sh` replaces it by a variable after process it to create the `shell-tools.sh`, this allows who use this script to change function names freely, avoiding collisions with other functions or commands.
+A script must define functions with the same name as the script file, the script code must never rely on the name of function to be unchanged, the `build.sh` replaces function names when it creates the `shell-tools.sh`, function names can be changed freely to avoiding collisions with other functions, variables or commands.
 ### Variables
-Variable names should be prefixed with `_st_` namespace, and variable expansions must always be enclosed by `{` `}`, it makes easier for tools like `sed` to find and process them.
+Variable names should be in lowercase prefixed with `_st_` namespace, parameter expansions must always be enclosed by `{` `}`, it makes easier for tools like `sed` to find and process them.
 ### Error Handling
-All commands are assumed to fail, even if you validated the parameters previously, if the shell option  `set -e` is enabled the script may exit the shell without presenting an helpful error message to the user, and sometimes errors must be handled elsewhere outside the function, that's why `command || { printf ... >&2; exit 1; }` and `command || return $?` are used everywhere in this codebase.
+All commands are assumed to fail, a command must exit with status 0 or have an error handler, to ignore errors use  `command || :` as this prevents the script from exit unexpectedly when the shell option `set -e` is enabled.  
+All explicitly non-zero `exit` declarations outside a subshell must be preceded by an error message, that's why `command || { printf ... >&2; exit 1; }` and `command || return $?` are used everywhere in this codebase.
 ### No side effects
 When possible prefer to write a pure script, unless when expected, a script must have no sides-effects besides changing the last command status `$?` or output some value, it cannot modify the shell or system environment, modify/create files, modify global variables, export, unset, etc..., examples of pure scripts include the functions defined at `basename.sh`, `dirname.sh`, `quote.sh`, `trim.sh` and `map.sh`. Sadly because the `local` keyword is not portable we must assume all variables are global, consequently to be pure it cannot declare variables outside a subshell, this come with drawbacks, but the benifit is that the caller and other functions don't need to worry about variable name collisions, it also prevents some bugs when a function may indirectly call itself. Some scripts also expects the environment to be untouched, example: A script that uses `set` to capture variables modified before and after execute another script.
 
