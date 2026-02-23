@@ -13,16 +13,16 @@
 #
 # Avoid Solaris 9 /usr/ucb/basename, as 'basename /' outputs an empty line.
 # Also, traditional basename mishandles --
-if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" = "X/";
+if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" = "X/"
 then :
 else :
 basename ()
 {
-  test $# -gt 0 || { echo 'basename: missing operand' >&2; return 127; };
+  test $# -gt 0 || { echo 'basename: missing operand' >&2; return 127; }
   if test x"${1}" = 'x--'
   then
-    shift > /dev/null 2>&1 || { echo 'basename: shift failed' >&2; return 127; };
-    test $# -gt 0 || { echo 'basename: missing operand' >&2; return 127; };
+    shift > /dev/null 2>&1 || { echo 'basename: shift failed' >&2; return 127; }
+    test $# -gt 0 || { echo 'basename: missing operand' >&2; return 127; }
   else :
   fi
 
@@ -32,14 +32,12 @@ basename ()
   # a silly length limit that causes `expr` to fail if the matched
   # substring is longer than 120 bytes.  So fall back on `printf|sed` if
   # `expr` fails.
-  {
-    expr a : '\(a\)' >/dev/null 2>&1 && \
-    test "X`expr 00001 : '.*\(...\)'`" = X001 >/dev/null 2>&1 && \
+  { expr a : '\(a\)' >/dev/null 2>&1 &&
+    test "X`expr 00001 : '.*\(...\)'`" = X001 >/dev/null 2>&1 &&
     expr X/"${1}" : '.*/\([^/][^/]*\)/*$' \| \
 	    X"${1}" : 'X\(//\)$' \| \
-	    X"${1}" : 'X\(/\)' \| .. 2>/dev/null;
-  } || {
-    printf '%s\n' X/"$1" | sed '/^.*\/\([^/][^/]*\)\/*$/{
+	    X"${1}" : 'X\(/\)' \| .. 2>/dev/null; } ||
+  { printf '%s\n' X/"${1}" | sed '/^.*\/\([^/][^/]*\)\/*$/{
 	      s//\1/
 	      q
 	    }
@@ -51,7 +49,6 @@ basename ()
 	      s//\1/
 	      q
 	    }
-	    s/.*/./; q';
-  };
+	    s/.*/./; q'; }
 }
 fi

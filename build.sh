@@ -9,25 +9,20 @@
 # Merge all scripts at `./scripts` directory in one 'shell-tools.sh'
 
 # 1. Find 'build.sh' file, assuming it is located at shell-tools's base directory.
-{ test "${0}" && test -f "${0}"; } || {
-  echo "file name \$0 is not defined, cannot find script root directory" >&2;
-  exit 1;
-};
+{ test "${0}" && test -f "${0}"; } ||
+{ echo "file name \$0 is not defined, cannot find script root directory" >&2; exit 1; }
 
 # 2. Find $0 base directory
-_st_basedir='';
-{
-  (st_dir=`dirname -- /` && test "X$st_dir" = X/) >/dev/null 2>&1 &&
-  _st_basedir=`dirname -- "${0}" 2> /dev/null`;
-} || {
-  expr a : '\(a\)' >/dev/null 2>&1 &&
+_st_basedir=''
+{ (st_dir=`dirname -- /` && test "X$st_dir" = X/) >/dev/null 2>&1 &&
+  _st_basedir=`dirname -- "${0}" 2> /dev/null`; } ||
+{ expr a : '\(a\)' >/dev/null 2>&1 &&
   test "X`expr 00001 : '.*\(...\)'`" = X001 &&
   _st_basedir=`expr X"${0}" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
 	  X"${0}" : 'X\(//\)[^/]' \| \
 	  X"${0}" : 'X\(//\)$' \| \
-	  X"${0}" : 'X\(/\)' \| . 2>/dev/null`;
-} || {
-  _st_basedir=`printf '%s\n' X"${0}" |
+	  X"${0}" : 'X\(/\)' \| . 2>/dev/null`; } ||
+{ _st_basedir=`printf '%s\n' X"${0}" |
   sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	  s//\1/
 	  q
@@ -44,78 +39,67 @@ _st_basedir='';
 	  s//\1/
 	  q
 	}
-	s/.*/./; q'`;
-} || {
-  echo "base directory not found '${0}'" >&2;
-  exit 1;
-};
+	s/.*/./; q'`; } ||
+{ echo "base directory not found '${0}'" >&2; exit 1; }
 
 # 3. Make sure we are in shell-tools's base directory
-{ 
-  test x"${_st_basedir}" != x &&
-  test -d "${_st_basedir}";
-} || {
-  printf %s\\n "directory '${_st_basedir}' not found" >&2;
-  exit 1;
-};
-test -f "${_st_basedir}/build.sh" || {
-  printf %s\\n "'${_st_basedir}/build.sh' not found, rerun with an absolute file name" >&2;
-  exit 1;
-};
-cd "${_st_basedir}" || {
-  printf %s\\n "change to directory '${_st_basedir}' failed $?" >&2;
-  exit 1;
-};
-test -d './scripts' || {
-  printf %s\\n "directory 'scripts' not found" >&2;
-  exit 1;
-};
-test -f './build.sh' || {
-  printf %s\\n "'./build.sh' not found, rerun with an absolute file name" >&2;
-  exit 1;
-};
+{ test x"${_st_basedir}" != x && test -d "${_st_basedir}"; } ||
+{ printf %s\\n "directory '${_st_basedir}' not found" >&2; exit 1; }
+test -f "${_st_basedir}/build.sh" ||
+{ printf %s\\n "'${_st_basedir}/build.sh' not found, rerun with an absolute file name" >&2; exit 1; }
+cd "${_st_basedir}" ||
+{ printf %s\\n "change to directory '${_st_basedir}' failed $?" >&2; exit 1; };
+test -d './scripts' ||
+{ printf %s\\n "directory 'scripts' not found" >&2; exit 1; }
+test -f './build.sh' ||
+{ printf %s\\n "'./build.sh' not found, rerun with an absolute file name" >&2; exit 1; }
 
-# 4. Load 'scripts/bourne_compatible.sh' script.
-test -f "./scripts/bourne_compatible.sh" || {
-  printf %s\\n "file not found './scripts/bourne_compatible.sh'" >&2;
-  exit 1;
-}
-. './scripts/bourne_compatible.sh'
+# 4. Load required shell scripts.
+_scripts='./scripts/bourne_compatible.sh
+./scripts/shell_sanitize.sh
+./scripts/append.sh
+./scripts/quote.sh
+./scripts/map.sh
+./scripts/test_varname.sh
+./scripts/basename.sh
+./scripts/pushvar.sh
+./scripts/popvar.sh'
+for v in ${_scripts}
+do test -f "${v}" \
+  || { printf %s\\n "file not found '${v}'" >&2; exit 1; }
+  . "${v}"
+done
+set -eu
 
-# 5. Load 'scripts/shell_sanitize.sh' script.
-test -f "./scripts/shell_sanitize.sh" || {
-  printf %s\\n "file not found './scripts/shell_sanitize.sh'" >&2;
-  exit 1;
-}
-. './scripts/shell_sanitize.sh'
+# 5. Find script basenames
+for v in ${_scripts}
+do _st_name=`basename -- "${v}"` ||
+{ printf %s\\n "'basename' failed for '${v}'" >&2; exit 1; }
+_st_name=`expr "X${_st_name}" ':' 'X\([^/][^/]*\)\.sh$'` ||
+{ printf %s\\n "'expr' failed for '${v}'" >&2; exit 1; }
+test_varname "${_st_name}" ||
+{ printf %s\\n "invalid varname '${_st_name}' for '${v}'" >&2; exit 1; }
+_st_name="${_st_name}=${v}"
+pushvar '_st_name'
+done
 
-# 6. Load other dependencies used in this script.
-test -f './scripts/append.sh' || {
-  printf %s\\n "file not found './scripts/append.sh'" >&2;
-  exit 1;
-}
-test -f './scripts/quote.sh' || {
-  printf %s\\n "file not found './scripts/quote.sh'" >&2;
-  exit 1;
-}
-test -f './scripts/map.sh' || {
-  printf %s\\n "file not found './scripts/map.sh'" >&2;
-  exit 1;
-}
-test -f './scripts/test_varname.sh' || {
-  printf %s\\n "file not found './scripts/map.sh'" >&2;
-  exit 1;
-}
-. './scripts/append.sh'
-. './scripts/quote.sh'
-. './scripts/map.sh'
-. './scripts/test_varname.sh'
-
-# Find 'git' and 'date' commands
-command -v 'git' > /dev/null || \
-{ printf %s\\n "command 'git' not found" >&2; exit 1; }
-command -v 'date' > /dev/null || \
-{ printf %s\\n "command 'date' not found" >&2; exit 1; }
+# 6. Format script list
+_scripts=''
+v=0
+while test ${v} -lt ${_st_name_level}
+do eval "_st_name=\${_st_name_${v}}"
+  v=`expr '1' '+' "${v}"`
+  if test ${v} -lt ${_st_name_level}
+  then append '_scripts' "${_st_name}${nl}"
+  else append '_scripts' "${_st_name}"
+  fi
+done
+while popvar '_st_name'
+do continue
+done
+v=''; unset 'v'
+_st_name=''; unset '_st_name'
+_st_name_level=''; unset '_st_name_level'
 
 ####################
 ## HELPER METHODS ##
@@ -126,17 +110,21 @@ command -v 'date' > /dev/null || \
 # quote a <FILE> then rename function <METHOD> to <ALIAS>
 _st_quote_file()
 {
-  test $# -eq 3 || { printf %s\\n "expect 1 values, provided $#" >&2; exit 1; }
-  test "${1##[0-9]*}" && test "x${1}" = "x${1#*[!A-Za-z0-9_]}" || { printf %s\\n "invalid variable name '${1}'" >&2; exit 1; }
-  test "${2##[0-9]*}" && test "x${2}" = "x${2#*[!A-Za-z0-9_]}" || { printf %s\\n "invalid variable name '${2}'" >&2; exit 1; }
-  test -f "${3}" || { printf %s\\n "file not found '${3}'" >&2; exit 1; }
+  test $# -eq 3 ||
+  { printf %s\\n "expect 1 values, provided $#" >&2; exit 1; }
+  test_varname "${1}" ||
+  { printf %s\\n "invalid variable name '${1}'" >&2; exit 1; }
+  test_varname "${2}" ||
+  { printf %s\\n "invalid variable name '${2}'" >&2; exit 1; }
+  test -f "${3}" ||
+  { printf %s\\n "file not found '${3}'" >&2; exit 1; }
   sed \
-    -e "s/'/'\\\\''/g" \
     -e '1d' \
-    -e "s/^${2} ()$/'\"\$\{${1}\}\"' ()/" \
+    -e "s/'/'\\\\''/g" \
+    -e "s/${2} ()/'\"\$\{${1}\}\"' ()/" \
     -e "2s/^/'/" \
     -e "\$s/\$/'/" \
-    -e "s#^'\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\2#" < "${3}" || \
+    -e "s#^'\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\2#" < "${3}" ||
   { printf %s\\n "sed failed $?" >&2; exit 1; }
 }
 
@@ -145,9 +133,12 @@ _st_quote_file()
 # print the item <FILE>, renames function <METHOD> to <ALIAS>
 _st_import()
 {
-  test $# -eq 3 || { printf %s\\n "expect 3 values, provided $#" >&2; exit 1; }
-  test "${1##[0-9]*}" && test "x${1}" = "x${1#*[!A-Za-z0-9_]}" || { printf %s\\n "invalid variable name '${1}'" >&2; exit 1; }
-  test "${2##[0-9]*}" && test "x${2}" = "x${2#*[!A-Za-z0-9_]}" || { printf %s\\n "invalid variable name '${2}'" >&2; exit 1; }
+  test $# -eq 3 ||
+  { printf %s\\n "expect 3 values, provided $#" >&2; exit 1; }
+  test_varname "${1}" ||
+  { printf %s\\n "invalid variable name '${1}'" >&2; exit 1; }
+  test_varname "${2}" ||
+  { printf %s\\n "invalid variable name '${2}'" >&2; exit 1; }
   test -f "${3}" || { printf %s\\n "file not found '${3}'" >&2; exit 1; }
   append "${1}" "\
 
@@ -155,10 +146,7 @@ _st_import()
 if grep '^${2}' >/dev/null 2>&1 <<EOL
 \${${1}}
 EOL
-then (
-eval \"\${${1}}\"
-printf '%s\n' $(_st_quote_file "${2}" "${2}" "${3}" 2>&1)
-)
+then (eval \"\${${1}}\"; printf '%s\n' `_st_quote_file "${2}" "${2}" "${3}" 2>&1`)
 else :
 fi
 "
@@ -182,15 +170,11 @@ EOF
 
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
 # Remove whitespaces
-${1}="$(
-LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '\n' 2>&1 <<EOL
-${${1}}
-EOL
-)" || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }
+${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '
+'` || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }
 
 # Parse options
-${1}="$(
-LC_ALL=C LANGUAGE=C  sed -n \
+${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C sed -n \
   -e "/^\n*$/b end" \
   -e 's/^\([A-Za-z_][A-Za-z0-9_]*\)$/\1=\1/; t ok' \
   -e "/^[A-Za-z_][A-Za-z0-9_]*=[A-Za-z_][A-Za-z0-9_]*$/b ok" \
@@ -199,27 +183,20 @@ LC_ALL=C LANGUAGE=C  sed -n \
   -e "s/$/'/" \
   -e ':ok' \
   -e 'p' \
-  -e ':end' 2>&1 <<EOL
-${${1}}
-EOL
-)" || { printf '%s\n' "[ERROR] sed failed '${${1}}'" >&2; exit 1; }
+  -e ':end'` ||
+{ printf '%s\n' "[ERROR] sed failed '${${1}}'" >&2; exit 1; }
 
-if test -z "${${1}}"
-then exit 0;
-else :
-fi
+test "X${${1}}" != X || exit 0
 
 # Validate options
-(
-_imports="${${1}}"
+(_imports="${${1}}";
 _st_error='';
-nl='
-';
 st_test='['\'']*'
 for v in ${_imports};
 do
 case "${v}" in 
-  $st_test ) eval "_st_error=\"\${_st_error}invalid option \"${v}'${nl}'"; continue ;;
+  $st_test ) eval "_st_error=\"\${_st_error}invalid option \"${v}'
+'"; continue ;;
   *=* ) a="${v%%[=]*}" ;;
   * ) a="${v}" ;;
 esac
@@ -227,19 +204,21 @@ EOF
 
 v='case "${a}" in
 '
-map 'append v "  $(printf %s "${1%%=*}") ) : ;;
-"' ${_scripts}
-append 'v' '  *) _st_error="${_st_error}unknown option '\''${a}'\''${nl}" ;;
+map "append v \"  \`expr \"X\${1}\" ':' '.\\([^=][^=]*\\)=.*$'\` ) : ;;
+\"" ${_scripts}
+
+append 'v' '  * ) _st_error="${_st_error}unknown option '\''${a}'\''
+" ;;
 '
-append 'v' 'esac;'
+append 'v' 'esac'
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
 ${v}
 EOF
 
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
 done
-test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }
-) || exit $?;
+test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }) ||
+exit $?;
 EOF
 
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
@@ -268,14 +247,14 @@ EOF
 # build the 'shell-tools.sh' and assign it to <VARNAME>
 _st_build()
 {
-  test "${1##[0-9]*}" && test "x${1}" = "x${1#*[!A-Za-z0-9_]}" || { printf %s\\n "invalid variable name '${1}'" >&2; exit 1; }
+  test_varname "${1}" ||
+  { printf %s\\n "invalid variable name '${1}'" >&2; exit 1; }
   eval "${1}='#!/bin/sh
 
 '"
   eval "append '${1}' $(_st_header)" || { printf %s\\n "eval failed" >&2; exit 1; }
-  for v in ${_scripts}; do
-    _st_import "${1}" "${v%%=*}" "${v#*=}"
-  done
+  map '_st_import '"'${1}'"' `expr "X${1}" ":" '\''.\([^=][^=]*\)=.*$'\''` `expr "X${1}" ":" '\''.[^=][^=]*=\(.*\)$'\''`' \
+  ${_scripts}
   append "${1}" "
 # cleanup
 ${1}=; unset '${1}';
@@ -305,6 +284,12 @@ EOL
 ## BEGIN SCRIPT ##
 ##################
 
+# 5. Find 'git' and 'date' commands
+command -v 'git' > /dev/null || \
+{ printf %s\\n "command 'git' not found" >&2; exit 1; }
+command -v 'date' > /dev/null || \
+{ printf %s\\n "command 'date' not found" >&2; exit 1; }
+
 # 7. validate arguments.
 _st_import='st_import'
 _st_output='./shell-tools.sh'
@@ -321,7 +306,7 @@ do
   fi
 
   case "${_st_option}" in
-    *=?*) _st_optarg="$(expr "X${_st_option}" : '[^=]*=\(.*\)')" ;;
+    *=?*) _st_optarg=`expr "X${_st_option}" : '[^=]*=\(.*\)'` ;;
     *=)   _st_optarg= ;;
     *)    _st_optarg=yes ;;
   esac
@@ -397,22 +382,19 @@ case "${_st_output}" in
     ;;
 esac
 
-# 8. Automatically find files at './scripts' directory.
-_scripts="bourne_compatible=./scripts/bourne_compatible.sh
-shell_sanitize=./scripts/shell_sanitize.sh
-append=./scripts/append.sh
-quote=./scripts/quote.sh
-map=./scripts/map.sh
-test_varname=./scripts/test_varname.sh
-"
+# 8. List scripts in './scripts' directory.
+fn_list_scripts ()
+{
+  { printf %s "${_scripts}" | grep "${1}" >/dev/null 2>&1 && return 0; } ||
+  v=`basename -- "${1}"` &&
+  v=`expr "X${v}" ":" 'X\([^/][^/]*\)\.sh$'` &&
+  test_varname "${v}" &&
+  append '_scripts' "${nl}${v}=${1}";
+}
 set +f
-map 'v="${1##*'/'}";
-v="${v%'.sh'}";
-if printf %s "${_scripts}" | grep "^${v}" >/dev/null 2>&1
-then :
-else append _scripts "${v}=${1}${nl}";
-fi' ./scripts/*
+map 'fn_list_scripts "${1}"' ./scripts/*
 set -f
+v=''; unset 'v'
 
 # 9. Merge all scripts
 _st_body="$(eval "_st_build '${_st_import}' > /dev/null 2>&1 && printf '%s\n' \"\${${_st_import}}\"")"
@@ -420,14 +402,10 @@ _st_body="$(eval "_st_build '${_st_import}' > /dev/null 2>&1 && printf '%s\n' \"
 # 10. Write to var `_st_body` to output.
 case "${_st_output}" in
   '-') printf '%s\n' "${_st_body}" ;;
-  *)
-    { printf '%s\n' "${_st_body}" > "${_st_output}"; } || {
-      printf '%s\n' "Cannot write to file '${_st_output}'" >&2;
-      exit 1;
-    };
-    chmod +x "${_st_output}" || {
-      printf '%s\n' "Cannot make file executable '${_st_output}'" >&2;
-      exit 1;
-    };
+  *) :
+    { printf '%s\n' "${_st_body}" > "${_st_output}"; } ||
+    { printf '%s\n' "Cannot write to file '${_st_output}'" >&2; exit 1; }
+    chmod +x "${_st_output}" ||
+    { printf '%s\n' "Cannot make file executable '${_st_output}'" >&2; exit 1; }
     ;;
 esac

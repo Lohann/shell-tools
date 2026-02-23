@@ -10,10 +10,10 @@ quote
 map
 test_varname
 basename
+pushvar
+popvar
 clean_dir
 dirname
-popvar
-pushvar
 sh_escape
 str_to_varname
 trim
@@ -22,15 +22,11 @@ version_compare
 '
 
 # Remove whitespaces
-st_import="$(
-LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '\n' 2>&1 <<EOL
-${st_import}
-EOL
-)" || { printf '%s\n' "[ERROR] tr failed '${st_import}'" >&2; exit 1; }
+st_import=`printf '%s\n' "${st_import}" | LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '
+'` || { printf '%s\n' "[ERROR] tr failed '${st_import}'" >&2; exit 1; }
 
 # Parse options
-st_import="$(
-LC_ALL=C LANGUAGE=C  sed -n \
+st_import=`printf '%s\n' "${st_import}" | LC_ALL=C LANGUAGE=C sed -n \
   -e "/^\n*$/b end" \
   -e 's/^\([A-Za-z_][A-Za-z0-9_]*\)$/\1=\1/; t ok' \
   -e "/^[A-Za-z_][A-Za-z0-9_]*=[A-Za-z_][A-Za-z0-9_]*$/b ok" \
@@ -39,27 +35,20 @@ LC_ALL=C LANGUAGE=C  sed -n \
   -e "s/$/'/" \
   -e ':ok' \
   -e 'p' \
-  -e ':end' 2>&1 <<EOL
-${st_import}
-EOL
-)" || { printf '%s\n' "[ERROR] sed failed '${st_import}'" >&2; exit 1; }
+  -e ':end'` ||
+{ printf '%s\n' "[ERROR] sed failed '${st_import}'" >&2; exit 1; }
 
-if test -z "${st_import}"
-then exit 0;
-else :
-fi
+test "X${st_import}" != X || exit 0
 
 # Validate options
-(
-_imports="${st_import}"
+(_imports="${st_import}";
 _st_error='';
-nl='
-';
 st_test='['\'']*'
 for v in ${_imports};
 do
 case "${v}" in 
-  $st_test ) eval "_st_error=\"\${_st_error}invalid option \"${v}'${nl}'"; continue ;;
+  $st_test ) eval "_st_error=\"\${_st_error}invalid option \"${v}'
+'"; continue ;;
   *=* ) a="${v%%[=]*}" ;;
   * ) a="${v}" ;;
 esac
@@ -71,25 +60,26 @@ case "${a}" in
   map ) : ;;
   test_varname ) : ;;
   basename ) : ;;
+  pushvar ) : ;;
+  popvar ) : ;;
   clean_dir ) : ;;
   dirname ) : ;;
-  popvar ) : ;;
-  pushvar ) : ;;
   sh_escape ) : ;;
   str_to_varname ) : ;;
   trim ) : ;;
   unix_timestamp ) : ;;
   version_compare ) : ;;
-  *) _st_error="${_st_error}unknown option '${a}'${nl}" ;;
-esac;
+  * ) _st_error="${_st_error}unknown option '${a}'
+" ;;
+esac
 done
-test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }
-) || exit $?;
+test x"${_st_error}" = x || { printf '%s\n%s' '[ERROR] invalid options:' "${_st_error}" >&2; exit 1; }) ||
+exit $?;
 printf "%s\n\n" '#!/bin/sh'
-printf '%s\n' '# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-20260222'
+printf '%s\n' '# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-20260223'
 printf '%s\n' "#   DATE: `date '+%Y-%m-%d'`"
 printf '%s\n' '# SOURCE: https://github.com/Lohann/shell-tools'
-printf '%s\n' '# COMMIT: e5b84b296a2f3653333bb2d0c44d748ad79c7b9c'
+printf '%s\n' '# COMMIT: 71606557897b5b55ee10223b7941d8482f4598f0'
 printf '\n'
 printf '%s\n' '# IMPORTED MODULES #'
 printf '%s=' "st_import"
@@ -103,9 +93,7 @@ printf '\n'
 if grep '^bourne_compatible' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -413,8 +401,7 @@ fi
 st_orig_opts='\'''\''; unset '\''st_orig_opts'\''
 _st_opts='\'''\''; unset '\''_st_opts'\''
 _st_code='\'''\''; unset '\''_st_code'\''
-_st_pat='\'''\''; unset '\''_st_pat'\'''
-)
+_st_pat='\'''\''; unset '\''_st_pat'\''')
 else :
 fi
 
@@ -422,9 +409,7 @@ fi
 if grep '^shell_sanitize' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -475,8 +460,7 @@ then :
 else
   echo shell doesn\'\''t support '\''test -x <file>'\'' >&2;
   exit 3;
-fi'
-)
+fi')
 else :
 fi
 
@@ -484,9 +468,7 @@ fi
 if grep '^append' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # append VAR VALUE
 # ----------------------
 # Append the text in VALUE to the end of the definition contained in VAR. Take
@@ -494,18 +476,15 @@ printf '%s\n' '
 # repeated appends, instead of the typical quadratic growth present in naive
 # implementations.
 if (eval "st_var=1; st_var+=2; test x\$st_var = x12") 2>/dev/null
-then eval '\''
-'"${append}"' ()
+then eval '\'''"${append}"' ()
 {
   eval "${1}+=\"\${2}\""
 }'\''
-else
-'"${append}"' ()
+else '"${append}"' ()
 {
   eval "${1}=\"\${${1}}\${2}\""
 }
-fi'
-)
+fi')
 else :
 fi
 
@@ -513,17 +492,14 @@ fi
 if grep '^quote' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # quote <STRING>
 # ----------------------
 # wraps the string in single quotes.
 '"${quote}"' ()
 {
   printf %s "x${*}x" | sed -e "s/'\''/'\''\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''
-}'
-)
+}')
 else :
 fi
 
@@ -531,22 +507,19 @@ fi
 if grep '^map' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # map <CODE> [...VALUE]
 # ----------------------
 # Assign each <VALUE> to $1 and eval <CODE>.
 '"${map}"' ()
 {
   test $# -gt 0 || return 1;
-  eval '\''while test $# -gt 1; do
-  shift > /dev/null 2>&1 || return $?;
-  eval '\''"`printf %s "x${1}x" | sed -e "s/'\''/'\''\\\\\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''`"'\''
+  eval "while test \$# -gt 1; do
+  shift > /dev/null 2>&1 || return \$?;
+  eval `printf '\''%s\n'\'' "x${1}x" | sed -e "s/'\''/'\''\\\\\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''`
 done
-return 0'\''
-}'
-)
+return 0"
+}')
 else :
 fi
 
@@ -554,9 +527,7 @@ fi
 if grep '^test_varname' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # valid_varname <STRING>
 # ----------------------
 # Check all arguments, check if <STRING> is a valid shell varname
@@ -572,8 +543,7 @@ printf '%s\n' '
     esac
     shift 2> /dev/null || return 127
   done
-}'
-)
+}')
 else :
 fi
 
@@ -581,9 +551,7 @@ fi
 if grep '^basename' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -597,16 +565,16 @@ printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Softwa
 #
 # Avoid Solaris 9 /usr/ucb/basename, as '\''basename /'\'' outputs an empty line.
 # Also, traditional basename mishandles --
-if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" = "X/";
+if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" = "X/"
 then :
 else :
 '"${basename}"' ()
 {
-  test $# -gt 0 || { echo '\''basename: missing operand'\'' >&2; return 127; };
+  test $# -gt 0 || { echo '\''basename: missing operand'\'' >&2; return 127; }
   if test x"${1}" = '\''x--'\''
   then
-    shift > /dev/null 2>&1 || { echo '\''basename: shift failed'\'' >&2; return 127; };
-    test $# -gt 0 || { echo '\''basename: missing operand'\'' >&2; return 127; };
+    shift > /dev/null 2>&1 || { echo '\''basename: shift failed'\'' >&2; return 127; }
+    test $# -gt 0 || { echo '\''basename: missing operand'\'' >&2; return 127; }
   else :
   fi
 
@@ -616,14 +584,12 @@ else :
   # a silly length limit that causes `expr` to fail if the matched
   # substring is longer than 120 bytes.  So fall back on `printf|sed` if
   # `expr` fails.
-  {
-    expr a : '\''\(a\)'\'' >/dev/null 2>&1 && \
-    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 && \
+  { expr a : '\''\(a\)'\'' >/dev/null 2>&1 &&
+    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 &&
     expr X/"${1}" : '\''.*/\([^/][^/]*\)/*$'\'' \| \
 	    X"${1}" : '\''X\(//\)$'\'' \| \
-	    X"${1}" : '\''X\(/\)'\'' \| .. 2>/dev/null;
-  } || {
-    printf '\''%s\n'\'' X/"$1" | sed '\''/^.*\/\([^/][^/]*\)\/*$/{
+	    X"${1}" : '\''X\(/\)'\'' \| .. 2>/dev/null; } ||
+  { printf '\''%s\n'\'' X/"${1}" | sed '\''/^.*\/\([^/][^/]*\)\/*$/{
 	      s//\1/
 	      q
 	    }
@@ -635,11 +601,78 @@ else :
 	      s//\1/
 	      q
 	    }
-	    s/.*/./; q'\'';
-  };
+	    s/.*/./; q'\''; }
 }
-fi'
-)
+fi')
+else :
+fi
+
+## pushvar ##
+if grep '^pushvar' >/dev/null 2>&1 <<EOL
+${st_import}
+EOL
+then (eval "${st_import}"; printf '%s\n' '
+# pushvar <VAR>
+# ----------------------
+# push a value into the stack <VAR>, if the stack doesn'\''t exists, create one.
+'"${pushvar}"' ()
+{
+  while test $# -gt 0; do
+    # Check stack varname
+    case ${1} in
+      [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
+        printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
+      [a-zA-Z_]* ) :
+        eval "test \${${1}+y}" 2> /dev/null || \
+        { printf %s\\n "'\''${1}'\'' is undefined" >&2; return 127; } ;;
+      * ) printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
+    esac
+    # check stack level
+    eval "test \"\${${1}_level:=0}\" -ge 0" 2> /dev/null || \
+    { printf %s\\n "invalid '\''${1}_level'\'': not an integer" >&2; return 127; }
+    # assign value to stack
+    eval "eval \"${1}_\${${1}_level}=\\\"\\\${${1}}\\\"\"" || return 127
+    # increment stack level
+    eval "${1}_level=\$(( 1 + \${${1}_level} ))" || return 127
+    test $# -gt 1 || return 0
+    shift 2> /dev/null || return 127
+  done
+}')
+else :
+fi
+
+## popvar ##
+if grep '^popvar' >/dev/null 2>&1 <<EOL
+${st_import}
+EOL
+then (eval "${st_import}"; printf '%s\n' '
+# popvar <VAR>
+# ----------------------
+# pops a value from the stack and assign it to <VAR>
+'"${popvar}"' ()
+{
+  while test $# -gt 0; do
+    # Check stack varname
+    case ${1} in
+      [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
+        printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
+      [a-zA-Z_]* ) :
+        eval "test \"\${${1}_level:-0}\" -ge 0" > /dev/null || \
+        { printf %s\\n "not a stack '\''${1}'\''" >&2; return 127; } ;;
+      * ) printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
+    esac
+    # check if the stack is empty
+    eval "test \"\${${1}_level:-0}\" -gt 0" || return 1
+    # decrement stack level
+    eval "${1}_level=\$(( \${${1}_level} - 1 ))" || return 127
+    # assign stack item to ${1}
+    eval "eval \"${1}=\\\"\\\${${1}_\${${1}_level}:=}\\\"\""
+    # unset stack value
+    eval "unset \"${1}_\${${1}_level}\"" 2> /dev/null || :
+    test $# -gt 1 || return 0
+    shift 2> /dev/null || return $?
+  done
+}')
 else :
 fi
 
@@ -647,9 +680,7 @@ fi
 if grep '^clean_dir' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # clean_dir <DIR>
 # ------------------
 # Remove all contents from within DIR, including any unwritable
@@ -681,8 +712,7 @@ printf '%s\n' '
   
   find "${1}" -type d ! -perm -700 -exec chmod u+rwx {} \; || :
   rm -fr "${1}"* "${1}".[!.] "${1}".??*
-}'
-)
+}')
 else :
 fi
 
@@ -690,9 +720,7 @@ fi
 if grep '^dirname' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -705,14 +733,16 @@ printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Softwa
 # dirname.
 if (st_dir=`dirname -- /` && test "X$st_dir" = X/) >/dev/null 2>&1;
 then :
-else :
-'"${dirname}"' ()
+else '"${dirname}"' ()
 {
-  test $# -gt 0 || { echo '\''dirname: missing operand'\'' >&2; return 127; };
+  test $# -gt 0 ||
+  { echo '\''dirname: missing operand'\'' >&2; return 127; };
   if test x"${1}" = '\''x--'\''
   then
-    shift > /dev/null || { echo '\''dirname: shift failed'\'' >&2; return 127; };
-    test $# -gt 0 || { echo '\''dirname: missing operand'\'' >&2; return 127; };
+    shift > /dev/null ||
+    { echo '\''dirname: shift failed'\'' >&2; return 127; };
+    test $# -gt 0 ||
+    { echo '\''dirname: missing operand'\'' >&2; return 127; };
   else :
   fi
 
@@ -722,15 +752,13 @@ else :
   # a silly length limit that causes `expr` to fail if the matched
   # substring is longer than 120 bytes.  So fall back on `printf|sed` if
   # `expr` fails.
-  {
-    expr a : '\''\(a\)'\'' >/dev/null 2>&1 && \
-    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 && \
+  { expr a : '\''\(a\)'\'' >/dev/null 2>&1 &&
+    test "X`expr 00001 : '\''.*\(...\)'\''`" = X001 >/dev/null 2>&1 &&
     expr X"${1}" : '\''X\(.*[^/]\)//*[^/][^/]*/*$'\'' \| \
 	  X"${1}" : '\''X\(//\)[^/]'\'' \| \
 	  X"${1}" : '\''X\(//\)$'\'' \| \
-	  X"${1}" : '\''X\(/\)'\'' \| . 2>/dev/null;
-  } || {
-    printf '\''%s\n'\'' X"${1}" | sed '\''/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
+	  X"${1}" : '\''X\(/\)'\'' \| . 2>/dev/null; } ||
+  { printf '\''%s\n'\'' X"${1}" | sed '\''/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
 	  }
@@ -749,83 +777,7 @@ else :
 	  s/.*/./; q'\'';
   };
 }
-fi'
-)
-else :
-fi
-
-## popvar ##
-if grep '^popvar' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
-# popvar <VAR>
-# ----------------------
-# pops a value from the stack and assign it to <VAR>
-'"${popvar}"' ()
-{
-  while test $# -gt 0; do
-    # Check stack varname
-    case ${1} in
-      [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
-        printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
-      [a-zA-Z_]* ) :
-        eval "test \"\${${1}_level:-0}\" -ge 0" > /dev/null || \
-        { printf %s\\n "not a stack '\''${1}'\''" >&2; return 127; } ;;
-      * ) printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
-    esac
-    # check if the stack is empty
-    eval "test \"\${${1}_level:-0}\" -gt 0" || return 1
-    # decrement stack level
-    eval "${1}_level=\$(( \${${1}_level} - 1 ))" || return 127
-    # assign stack item to ${1}
-    eval "eval \"${1}=\\\"\\\${${1}_\${${1}_level}:=}\\\"\""
-    # unset stack value
-    eval "unset \"${1}_\${${1}_level}\"" 2> /dev/null || :
-    test $# -gt 1 || return 0
-    shift 2> /dev/null || return $?
-  done
-}'
-)
-else :
-fi
-
-## pushvar ##
-if grep '^pushvar' >/dev/null 2>&1 <<EOL
-${st_import}
-EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
-# pushvar <VAR>
-# ----------------------
-# push a value into the stack <VAR>, if the stack doesn'\''t exists, create one.
-'"${pushvar}"' ()
-{
-  while test $# -gt 0; do
-    # Check stack varname
-    case ${1} in
-      [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
-        printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
-      [a-zA-Z_]* ) :
-        eval "test \${${1}+y}" 2> /dev/null || \
-        { printf %s\\n "'\''${1}'\'' is undefined" >&2; return 127; } ;;
-      * ) printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
-    esac
-    # check stack level
-    eval "test \"\${${1}_level:=0}\" -ge 0" 2> /dev/null || \
-    { printf %s\\n "invalid '\''${1}_level'\'': not an integer" >&2; return 127; }
-    # assign value to stack
-    eval "eval \"${1}_\${${1}_level}=\\\"\\\${${1}}\\\"\"" || return 127
-    # increment stack level
-    eval "${1}_level=\$(( 1 + \${${1}_level} ))" || return 127
-    test $# -gt 1 || return 0
-    shift 2> /dev/null || return 127
-  done
-}'
-)
+fi')
 else :
 fi
 
@@ -833,9 +785,7 @@ fi
 if grep '^sh_escape' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # sh_escape [...ARGS]
 # ----------------------
 # Escape and quote the provided arguments, the printed string
@@ -866,8 +816,7 @@ EOF
     shift 2> /dev/null || return $?
     printf %s '\'' '\''
   done
-}'
-)
+}')
 else :
 fi
 
@@ -875,9 +824,7 @@ fi
 if grep '^str_to_varname' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # valid_varname <STRING>
 # ----------------------
 # Transform <STRING> into a valid shell variable name.
@@ -887,8 +834,7 @@ printf '%s\n' '
 
   # Avoid depending upon Character Ranges.
   printf '\''%s\n'\'' "${1}" | sed '\''y%*+%pp%;s%[^_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]%_%g'\''
-}'
-)
+}')
 else :
 fi
 
@@ -896,9 +842,7 @@ fi
 if grep '^trim' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # trim <STRING>
 # ---------------------
 # Removes blank characters [ \t\n\r\f\v] from both ends of this string
@@ -915,8 +859,7 @@ printf '%s\n' '
     -e '\''s/^[[:space:]]*//'\'' \
     -e '\''s/[[:space:]]*$//'\'' \
     -e '\''p'\''
-}'
-)
+}')
 else :
 fi
 
@@ -924,9 +867,7 @@ fi
 if grep '^unix_timestamp' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '
+then (eval "${st_import}"; printf '%s\n' '
 # Sadly `date +%s` is not portable.
 # The only magic number in here is 135140, the number of days between
 # 1600-01-01 and 1970-01-01 treating both as Gregorian dates. 1600 is
@@ -939,28 +880,24 @@ printf '%s\n' '
 # unix_timestamp
 # ---------------------
 # Prints the unix timestamp, which is seconds passed since January 1st, 1970 at UTC
-if (eval '\''st_time=`date "+%s"` && test "$st_time" -gt 1000000000'\'') 2> /dev/null
-then eval "
-'"${unix_timestamp}"' ()
+if (eval '\''st_time=`TZ=GMT0 LANGUAGE=C LC_ALL=C date "+%s"` && test "$st_time" -gt 1000000000'\'') 2> /dev/null
+then '"${unix_timestamp}"' ()
 {
-  date '\''+%s'\'' 
-}"
+  TZ=GMT0 LANGUAGE=C LC_ALL=C date '\''+%s'\'' 
+}
 elif (eval "test \$(( 1 + 1 )) = 2") 2>/dev/null
-then eval '\''
-'"${unix_timestamp}"' ()
+then eval '\'''"${unix_timestamp}"' ()
 {
 printf %s\\n $((`TZ=GMT0 LANGUAGE=C LC_ALL=C date \
 '\''\'\'''\''+((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400+1%j-1000-135140)*86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)'\''\'\'''\''`))
 }'\''
-else eval '\''
-unix_timestamp () 
+else '"${unix_timestamp}"' ()
 { 
-(d=`TZ=GMT0 LANGUAGE=C LC_ALL=C date '\''\'\'''\''+y=%Y;j=1%j;h=1%H;m=1%M;s=1%S'\''\'\'''\'' 2> /dev/null` && \
+(d=`TZ=GMT0 LANGUAGE=C LC_ALL=C date '\''+y=%Y;j=1%j;h=1%H;m=1%M;s=1%S'\'' 2> /dev/null` && \
 eval "${d}" 2> /dev/null && \
 expr \( \( $y \- 1600 \) \* 365 \+ \( $y \- 1600 \) \/ 4 \- \( $y \- 1600 \) \/ 100 \+ \( $y \- 1600 \) \/ 400 \+ $j \- 1000 \- 135140 \) \* 86400 \+ \( $h \- 100 \) \* 3600 \+ \( $m \- 100 \) \* 60 \+ \( $s \- 100 \))
-}'\''
-fi # unix_timestamp'
-)
+}
+fi # unix_timestamp')
 else :
 fi
 
@@ -968,9 +905,7 @@ fi
 if grep '^version_compare' >/dev/null 2>&1 <<EOL
 ${st_import}
 EOL
-then (
-eval "${st_import}"
-printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
+then (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
 # This is a modified version of m4sh from GNU autoconf v2.72
@@ -1101,8 +1036,7 @@ END {
     [123456] ) return 1 ;;
     * ) return 127 ;;
   esac
-}'
-)
+}')
 else :
 fi
 

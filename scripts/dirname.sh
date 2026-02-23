@@ -12,14 +12,16 @@
 # dirname.
 if (st_dir=`dirname -- /` && test "X$st_dir" = X/) >/dev/null 2>&1;
 then :
-else :
-dirname ()
+else dirname ()
 {
-  test $# -gt 0 || { echo 'dirname: missing operand' >&2; return 127; };
+  test $# -gt 0 ||
+  { echo 'dirname: missing operand' >&2; return 127; };
   if test x"${1}" = 'x--'
   then
-    shift > /dev/null || { echo 'dirname: shift failed' >&2; return 127; };
-    test $# -gt 0 || { echo 'dirname: missing operand' >&2; return 127; };
+    shift > /dev/null ||
+    { echo 'dirname: shift failed' >&2; return 127; };
+    test $# -gt 0 ||
+    { echo 'dirname: missing operand' >&2; return 127; };
   else :
   fi
 
@@ -29,15 +31,13 @@ dirname ()
   # a silly length limit that causes `expr` to fail if the matched
   # substring is longer than 120 bytes.  So fall back on `printf|sed` if
   # `expr` fails.
-  {
-    expr a : '\(a\)' >/dev/null 2>&1 && \
-    test "X`expr 00001 : '.*\(...\)'`" = X001 >/dev/null 2>&1 && \
+  { expr a : '\(a\)' >/dev/null 2>&1 &&
+    test "X`expr 00001 : '.*\(...\)'`" = X001 >/dev/null 2>&1 &&
     expr X"${1}" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
 	  X"${1}" : 'X\(//\)[^/]' \| \
 	  X"${1}" : 'X\(//\)$' \| \
-	  X"${1}" : 'X\(/\)' \| . 2>/dev/null;
-  } || {
-    printf '%s\n' X"${1}" | sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
+	  X"${1}" : 'X\(/\)' \| . 2>/dev/null; } ||
+  { printf '%s\n' X"${1}" | sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
 	  }
@@ -53,7 +53,6 @@ dirname ()
 	    s//\1/
 	    q
 	  }
-	  s/.*/./; q';
-  };
+	  s/.*/./; q'; }
 }
 fi

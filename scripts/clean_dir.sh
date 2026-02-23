@@ -17,8 +17,7 @@ clean_dir ()
     *f* ) printf '%s\n' "pathname expansion is disabled, please enable it 'set +f'" >&2; return 127 ;;
     * ) : ;;
   esac
-  (
-  cd "${1}" || return 127
+  (cd "${1}" || return 127
   set x .[!.]* && shift || return 127
   test ! -f "${1}" || return 0
   set x ..?*  && shift || return 127
@@ -26,8 +25,8 @@ clean_dir ()
   set x * && shift || return 127
   test ! -f "${1}" || return 0
   shift || return 127
-  return 7
-  ) || case $? in 7 ) return 0 ;; * ) return 127 ;; esac
+  return 7;) ||
+  case $? in 7 ) return 0 ;; * ) return 127 ;; esac
   
   find "${1}" -type d ! -perm -700 -exec chmod u+rwx {} \; || :
   rm -fr "${1}"* "${1}".[!.] "${1}".??*
