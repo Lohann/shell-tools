@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-0750b26
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-3363e16
 # COMMAND: ./build.sh --import=st_import --output=./shell-tools.sh
-#    DATE: 2026-02-23
+#    DATE: 2026-02-24
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: e0b1d69c50cd1a8ec3847bf18476269af331875d09ba57c1eb5edb6d850f363e
+#  SHA256: 4f21aef92c97287644e17d7401773420b20f54d1598a16418274b6909d6560f5
 
 ##################
 ## SCRIPT START ##
@@ -83,10 +83,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-0750b26
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-3363e16
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: e0b1d69c50cd1a8ec3847bf18476269af331875d09ba57c1eb5edb6d850f363e
+# SHA256: 4f21aef92c97287644e17d7401773420b20f54d1598a16418274b6909d6560f5
 
 EOLHEADER
 
@@ -174,9 +174,9 @@ do
     * ) break ;;
   esac
 done
-test x${_st_opts} = x || \
-  { set +${_st_opts} && \
-    { test ${st_orig_opts+y} || \
+test x${_st_opts} = x ||
+  { set +${_st_opts} &&
+    { test ${st_orig_opts+y} ||
       { st_orig_opts=${_st_opts} && export st_orig_opts; }; }; }
 ( (unset '\''_st_val'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_val'\'' '\''_st_code'\'' '\''_st_opts'\'' || :
 
@@ -633,12 +633,12 @@ echo "${st_import}" | grep '^pushvar' >/dev/null 2>&1 &&
       [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
         printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
       [a-zA-Z_]* ) :
-        eval "test \${${1}+y}" 2> /dev/null || \
+        eval "test \${${1}+y}" 2> /dev/null ||
         { printf %s\\n "'\''${1}'\'' is undefined" >&2; return 127; } ;;
       * ) printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
     esac
     # check stack level
-    eval "test \"\${${1}_level:=0}\" -ge 0" 2> /dev/null || \
+    eval "test \"\${${1}_level:=0}\" -ge 0" 2> /dev/null ||
     { printf %s\\n "invalid '\''${1}_level'\'': not an integer" >&2; return 127; }
     # assign value to stack
     eval "eval \"${1}_\${${1}_level}=\\\"\\\${${1}}\\\"\"" || return 127
@@ -663,7 +663,7 @@ echo "${st_import}" | grep '^popvar' >/dev/null 2>&1 &&
       [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
         printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
       [a-zA-Z_]* ) :
-        eval "test \"\${${1}_level:-0}\" -ge 0" > /dev/null || \
+        eval "test \"\${${1}_level:-0}\" -ge 0" > /dev/null ||
         { printf %s\\n "not a stack '\''${1}'\''" >&2; return 127; } ;;
       * ) printf %s\\n "invalid varname '\''${1}'\''" >&2; return 127 ;;
     esac
