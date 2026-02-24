@@ -11,12 +11,12 @@ pushvar ()
       [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
         printf %s\\n "invalid varname '${1}'" >&2; return 127 ;;
       [a-zA-Z_]* ) :
-        eval "test \${${1}+y}" 2> /dev/null || \
+        eval "test \${${1}+y}" 2> /dev/null ||
         { printf %s\\n "'${1}' is undefined" >&2; return 127; } ;;
       * ) printf %s\\n "invalid varname '${1}'" >&2; return 127 ;;
     esac
     # check stack level
-    eval "test \"\${${1}_level:=0}\" -ge 0" 2> /dev/null || \
+    eval "test \"\${${1}_level:=0}\" -ge 0" 2> /dev/null ||
     { printf %s\\n "invalid '${1}_level': not an integer" >&2; return 127; }
     # assign value to stack
     eval "eval \"${1}_\${${1}_level}=\\\"\\\${${1}}\\\"\"" || return 127

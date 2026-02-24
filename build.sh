@@ -311,9 +311,9 @@ EOL
 ##################
 
 # 5. Find 'git' and 'date' commands
-command -v 'git' > /dev/null || \
+command -v 'git' > /dev/null ||
 { printf %s\\n "command 'git' not found" >&2; exit 1; }
-command -v 'date' > /dev/null || \
+command -v 'date' > /dev/null ||
 { printf %s\\n "command 'date' not found" >&2; exit 1; }
 
 # 7. validate arguments.

@@ -77,9 +77,9 @@ do
     * ) break ;;
   esac
 done
-test x${_st_opts} = x || \
-  { set +${_st_opts} && \
-    { test ${st_orig_opts+y} || \
+test x${_st_opts} = x ||
+  { set +${_st_opts} &&
+    { test ${st_orig_opts+y} ||
       { st_orig_opts=${_st_opts} && export st_orig_opts; }; }; }
 ( (unset '_st_val') || exit 1) >/dev/null 2>&1 && unset '_st_val' '_st_code' '_st_opts' || :
 
