@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-3dc5e0d
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-04b7350
 # COMMAND: build.sh --import=st_import --output=./shell-tools.sh
 #    DATE: 2026-03-27
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: 8af84357b92006b2ff92c643b2300b8694a6234a9b5675c218c8a6ce064c40f7
+#  SHA256: df947a210ca4a6c0dd149064b8be1c99c8b208695c7f4c99577758376ca495b8
 
 ##################
 ## SCRIPT START ##
@@ -95,10 +95,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-3dc5e0d
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-04b7350
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: 8af84357b92006b2ff92c643b2300b8694a6234a9b5675c218c8a6ce064c40f7
+# SHA256: df947a210ca4a6c0dd149064b8be1c99c8b208695c7f4c99577758376ca495b8
 
 EOLHEADER
 
@@ -329,25 +329,25 @@ echo "${st_import}" | grep '^locals' >/dev/null 2>&1 &&
   { printf "%s\n" "[ERROR] '"${locals}"'_declare: '\''__st_'"${locals}"''\'' isn'\''t an integer" >&2; return 127; }
   if test "$__st_'"${locals}"'" -gt 0
   then
-    set "x" "$__st_'"${locals}"'" "$@" && shift || return "$?"
-    __st_'"${locals}"'=`expr "1" "+" "$__st_'"${locals}"'" || test "$?" -eq 1` || exit
-    eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''__st_'"${locals}"'=${1};unset \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" && shift || return "$?"
+    set "x" "$__st_'"${locals}"'" "$@" && shift || return 125
+    __st_'"${locals}"'=`expr "1" "+" "$__st_'"${locals}"'" || test "$?" -eq 1` || return 125
+    eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''__st_'"${locals}"'=${1};unset \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" && shift || return 125
   else
-    eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''unset \"__st_'"${locals}"'\" \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" || return "$?"
+    eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''unset \"__st_'"${locals}"'\" \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" || return 125
   fi
   while test "$#" -gt 0
   do
     if eval "test \${$1+y}" 2>/dev/null
     then
-      test "x$__st_'"${locals}"'" != "x__st_'"${locals}"'" || { shift || exit; continue; }
-      { set x "$__st_'"${locals}"'" "$@" && shift; } || exit
-      __st_'"${locals}"'=`expr "1" "+" "$__st_'"${locals}"'" || test "$?" -eq 1` || exit
+      test "x$__st_'"${locals}"'" != "x__st_'"${locals}"'" || { shift || return 125; continue; }
+      { set x "$__st_'"${locals}"'" "$@" && shift; } || return 125
+      __st_'"${locals}"'=`expr "1" "+" "$__st_'"${locals}"'" || test "$?" -eq 1` || return 125
       eval "__st_'"${locals}"'${__st_'"${locals}"'}=\"${2}=\\\$__st_'"${locals}"'${1};\$__st_'"${locals}"'${1} \\\"__st_'"${locals}"'${__st_'"${locals}"'}\\\"\" &&
       __st_'"${locals}"'${1}=\$${2} &&
-      unset '\''${2}'\''" || exit
-      { shift && shift; } || exit
+      unset '\''${2}'\''" || return 125
+      { shift && shift; } || return 125
     else
-      eval "__st_'"${locals}"'${__st_'"${locals}"'}=\"\$__st_'"${locals}"'${__st_'"${locals}"'} \\\"${1}\\\"\"" && shift || exit
+      eval "__st_'"${locals}"'${__st_'"${locals}"'}=\"\$__st_'"${locals}"'${__st_'"${locals}"'} \\\"${1}\\\"\"" && shift || return 125
     fi
   done
 }
