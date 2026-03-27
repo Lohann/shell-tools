@@ -17,7 +17,7 @@ locals_declare ()
   { printf "%s\n" "[ERROR] locals_declare: '__st_locals' isn't an integer" >&2; return 127; }
   if test "$__st_locals" -gt 0
   then
-    set "x" "$__st_locals" "$@" && shift || return 125
+    set x "$__st_locals" "$@" && shift || return 125
     __st_locals=`expr "1" "+" "$__st_locals" || test "$?" -eq 1` || return 125
     eval "__st_locals${__st_locals}='__st_locals=${1};unset \"__st_locals${__st_locals}\"'" && shift || return 125
   else

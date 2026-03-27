@@ -87,17 +87,15 @@ st_prev=
 st_ifs=$IFS
 case $0 in
   *[\\/]* )
-    case $0 in *?/ ) _st_myself=$0/ ;; * ) _st_myself=$0 ;; esac
     st_sep= st_prev= _st_basedir= IFS=/
-    for _st_myself in $_st_myself
+    for _st_myself in $0
     do
-      _st_basedir=$_st_basedir$st_sep
+      _st_basedir=$_st_basedir$st_prev
       st_prev=$st_sep$_st_myself
       st_sep=/
     done
     IFS=$st_ifs
     test "x$_st_basedir" != x || { _st_basedir=$st_sep; st_sep=;}
-    _st_basedir=$_st_basedir$st_sep
     ;;
   *)
     _st_myself=
@@ -121,15 +119,17 @@ case $0 in
       st_sep=
     done
     IFS=$st_ifs
-    _st_basedir=$_st_basedir$st_sep
     ;;
 esac
-{ st_sep=; unset st_sep; }
-{ st_prev=; unset st_prev; }
-{ st_ifs=; unset st_ifs; }
 
 # We did not find ourselves, most probably we were run as `sh COMMAND'
 # in which case we are not to be found in the path.
 test "x$_st_myself" != x || _st_myself=$0
-test -f "$_st_myself" ||
+test -f "$_st_basedir$st_sep$_st_myself" ||
 { printf "%s\n" "$_st_myself: error: cannot find myself; rerun with an absolute file name" >&2; exit 1; }
+test -d "$_st_basedir" ||
+{ printf "%s\n" "$_st_basedir: error: cannot find base directory; rerun with an absolute file name" >&2; exit 1; }
+_st_basedir=$_st_basedir$st_sep
+{ st_sep=; unset st_sep; }
+{ st_prev=; unset st_prev; }
+{ st_ifs=; unset st_ifs; }
