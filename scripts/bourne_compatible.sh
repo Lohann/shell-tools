@@ -78,3 +78,58 @@ if ${PATH_SEPARATOR+false} :; then
       PATH_SEPARATOR=';'
   }
 fi
+
+# Find who we are. Look in the path if we contain no directory separator.
+_st_basedir=
+_st_myself=
+st_sep=
+st_prev=
+st_ifs=$IFS
+case $0 in
+  *[\\/]* )
+    case $0 in *?/ ) _st_myself=$0/ ;; * ) _st_myself=$0 ;; esac
+    st_sep= st_prev= _st_basedir= IFS=/
+    for _st_myself in $_st_myself
+    do
+      _st_basedir=$_st_basedir$st_sep
+      st_prev=$st_sep$_st_myself
+      st_sep=/
+    done
+    IFS=$st_ifs
+    test "x$_st_basedir" != x || { _st_basedir=$st_sep; st_sep=;}
+    _st_basedir=$_st_basedir$st_sep
+    ;;
+  *)
+    _st_myself=
+    IFS=$PATH_SEPARATOR
+    for _st_basedir in $PATH
+    do
+      IFS=$st_ifs
+      case $_st_basedir in
+        '') _st_basedir=. st_sep=/ ;;
+         /) st_sep= ;;
+        */)
+          st_prev=$_st_basedir _st_basedir= st_sep= IFS=/
+          for st_prev in $st_prev
+          do _st_basedir=$_st_basedir$st_sep$st_prev st_sep=/
+          done
+          IFS=$st_ifs ;;
+        * ) st_sep=/ ;;
+      esac
+      { test -r "$_st_basedir$st_sep$0" && _st_myself=$0 && break; } || :
+      _st_basedir=
+      st_sep=
+    done
+    IFS=$st_ifs
+    _st_basedir=$_st_basedir$st_sep
+    ;;
+esac
+{ st_sep=; unset st_sep; }
+{ st_prev=; unset st_prev; }
+{ st_ifs=; unset st_ifs; }
+
+# We did not find ourselves, most probably we were run as `sh COMMAND'
+# in which case we are not to be found in the path.
+test "x$_st_myself" != x || _st_myself=$0
+test -f "$_st_myself" ||
+{ printf "%s\n" "$_st_myself: error: cannot find myself; rerun with an absolute file name" >&2; exit 1; }

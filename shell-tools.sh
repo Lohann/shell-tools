@@ -1,17 +1,19 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-3363e16
-# COMMAND: ./build.sh --import=st_import --output=./shell-tools.sh
-#    DATE: 2026-02-24
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-3dc5e0d
+# COMMAND: build.sh --import=st_import --output=./shell-tools.sh
+#    DATE: 2026-03-27
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: 4f21aef92c97287644e17d7401773420b20f54d1598a16418274b6909d6560f5
+#  SHA256: 8af84357b92006b2ff92c643b2300b8694a6234a9b5675c218c8a6ce064c40f7
 
 ##################
 ## SCRIPT START ##
 ##################
-test x"${st_import:-}" != 'x' || st_import='bourne_compatible
-shell_sanitize
+test ${st_import+y} &&
+test x"${st_import}" != 'x' || st_import='bourne_compatible
+shell_sanity_check
 append
+locals
 quote
 sh_escape
 map
@@ -24,12 +26,21 @@ dirname
 str_to_varname
 trim
 unix_timestamp
-version_compare
-'
+version_compare'
 
 # Remove whitespaces
-st_import=`printf '%s\n' "${st_import}" | LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '
-'` || { printf '%s\n' "[ERROR] tr failed '${st_import}'" >&2; exit 1; }
+case `printf '%bX%b' '\141' '\x61' 2> /dev/null` in
+  aX*) :
+    { st_import=`printf '%s\n' "${st_import}" | LC_ALL=C LANGUAGE=C tr '[\001-\040\176-\377]' "
+"` || { printf '%s\n' "[ERROR] tr failed '${st_import}'" >&2; exit 1; }; } ;;
+  *Xa) :
+    { st_import=`printf '%s\n' "${st_import}" | LC_ALL=C LANGUAGE=C tr '[\x01-\x20\x76\xfe]' "
+"` || { printf '%s\n' "[ERROR] tr failed '${st_import}'" >&2; exit 1; }; } ;;
+  *) :
+    { st_import=`printf '%s\n' "${st_import}" | LC_ALL=C LANGUAGE=C tr " ""	
+" "
+"` || { printf '%s\n' "[ERROR] tr failed '${st_import}'" >&2; exit 1; }; } ;;
+esac
 
 # Parse options
 st_import=`printf '%s\n' "${st_import}" | LC_ALL=C LANGUAGE=C sed -n \
@@ -49,7 +60,7 @@ test "X${st_import}" != X || exit 0
 # Validate options
 (eval '_imports="${st_import}"
 _st_error=
-st_case='\''['\''\'\'''\'']*'\''
+st_case='\''['\''\'\'\'']*'\''
 for v in ${_imports}
 do case ${v} in
   $st_case ) eval "_st_error=\"\${_st_error}invalid option \"${v}'\''
@@ -59,8 +70,9 @@ do case ${v} in
 esac
 case "${a}" in
   bourne_compatible ) : ;;
-  shell_sanitize ) : ;;
+  shell_sanity_check ) : ;;
   append ) : ;;
+  locals ) : ;;
   quote ) : ;;
   sh_escape ) : ;;
   map ) : ;;
@@ -83,10 +95,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-3363e16
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-3dc5e0d
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: 4f21aef92c97287644e17d7401773420b20f54d1598a16418274b6909d6560f5
+# SHA256: 8af84357b92006b2ff92c643b2300b8694a6234a9b5675c218c8a6ce064c40f7
 
 EOLHEADER
 
@@ -151,34 +163,20 @@ export LANG
 # avoid bugs in old shells (e.g. pre-3.0 UWIN ksh).  This construct
 # also avoids known problems related to "unset" and subshell syntax
 # in other old shells (e.g. bash 2.01 and pdksh 5.2.14).
-for _st_val in BASH_ENV ENV MAIL MAILPATH CDPATH
-do eval "test \${${_st_val}+y}" && \
-( (unset "${_st_val}") || exit 1) >/dev/null 2>&1 && unset "${_st_val}" || :
-done
+test ${BASH_ENV+y} && ( (unset BASH_ENV) || exit 1) >/dev/null 2>&1 && unset BASH_ENV || :
+test ${ENV+y} && ( (unset ENV) || exit 1) >/dev/null 2>&1 && unset ENV || :
+test ${MAIL+y} && ( (unset MAIL) || exit 1) >/dev/null 2>&1 && unset MAIL || :
+test ${MAILPATH+y} && ( (unset MAILPATH) || exit 1) >/dev/null 2>&1 && unset MAILPATH || :
+test ${CDPATH+y} && ( (unset CDPATH) || exit 1) >/dev/null 2>&1 && unset CDPATH || :
+
+# Unset more variables known to interfere with behavior of common tools.
+test ${CLICOLOR_FORCE+y} && ( (unset CLICOLOR_FORCE) || exit 1) >/dev/null 2>&1 && unset CLICOLOR_FORCE || :
+test ${GREP_OPTIONS+y} && ( (unset GREP_OPTIONS) || exit 1) >/dev/null 2>&1 && unset GREP_OPTIONS || :
 
 # Ensure that fds 0, 1, and 2 are open.
 if (exec 3>&0) 2>/dev/null; then :; else exec 0</dev/null; fi
 if (exec 3>&1) 2>/dev/null; then :; else exec 1>/dev/null; fi
 if (exec 3>&2)            ; then :; else exec 2>/dev/null; fi
-
-# Disable shell features which may cause this script to fail
-# those features are saved in st_orig_opts and restored later.
-_st_opts='\'''\''
-for _st_code in '\''H'\'' '\''a'\'' '\''m'\'' '\''f'\'' '\''e'\'' '\''u'\'' '\''C'\'' '\''B'\''
-do
-  _st_val="*[${_st_code}]*"
-  case $_st_opts in $_st_val ) continue ;; * ) : ;; esac
-  case $- in
-    $_st_val ) _st_opts="${_st_opts}${_st_code}" ;;
-    *[HamfeuCB]* ) continue ;;
-    * ) break ;;
-  esac
-done
-test x${_st_opts} = x ||
-  { set +${_st_opts} &&
-    { test ${st_orig_opts+y} ||
-      { st_orig_opts=${_st_opts} && export st_orig_opts; }; }; }
-( (unset '\''_st_val'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_val'\'' '\''_st_code'\'' '\''_st_opts'\'' || :
 
 # The user is always right.
 if ${PATH_SEPARATOR+false} :; then
@@ -190,224 +188,63 @@ if ${PATH_SEPARATOR+false} :; then
   }
 fi
 
-# Find who we are.  Look in the path if we contain no directory separator.
-_st_myself='\'''\''
-case "${0}" in
-  *[\\/]* ) _st_myself="${0}" ;;
-  *)
-    _st_ifs_backup="${IFS}"
-    IFS="${PATH_SEPARATOR}"
-    # shellcheck disable=SC2031
-    for _st_dir in ${PATH}
+# Find who we are. Look in the path if we contain no directory separator.
+_st_basedir=
+_st_myself=
+st_sep=
+st_prev=
+st_ifs=$IFS
+case $0 in
+  *[\\/]* )
+    case $0 in *?/ ) _st_myself=$0/ ;; * ) _st_myself=$0 ;; esac
+    st_sep= st_prev= _st_basedir= IFS=/
+    for _st_myself in $_st_myself
     do
-      IFS="${_st_ifs_backup}"
-      case "${_st_dir}" in
-        '\'''\'') _st_dir='\''./'\'' ;;
-        */) ;;
-        *) _st_dir="${_st_dir}/" ;;
-      esac
-      if test -r "${_st_dir}${0}"
-      then _st_myself="${_st_dir}${0}"; break;
-      else continue;
-      fi
+      _st_basedir=$_st_basedir$st_sep
+      st_prev=$st_sep$_st_myself
+      st_sep=/
     done
-    IFS="${_st_ifs_backup}";
-    { test ${_st_dir+y} && ( (unset '\''_st_dir'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_dir'\''; } || :
-    { test ${_st_ifs_backup+y} && ( (unset '\''_st_ifs_backup'\'') || exit 1) >/dev/null 2>&1 && unset '\''_st_ifs_backup'\''; } || :
+    IFS=$st_ifs
+    test "x$_st_basedir" != x || { _st_basedir=$st_sep; st_sep=;}
+    _st_basedir=$_st_basedir$st_sep
+    ;;
+  *)
+    _st_myself=
+    IFS=$PATH_SEPARATOR
+    for _st_basedir in $PATH
+    do
+      IFS=$st_ifs
+      case $_st_basedir in
+        '\'\'') _st_basedir=. st_sep=/ ;;
+         /) st_sep= ;;
+        */)
+          st_prev=$_st_basedir _st_basedir= st_sep= IFS=/
+          for st_prev in $st_prev
+          do _st_basedir=$_st_basedir$st_sep$st_prev st_sep=/
+          done
+          IFS=$st_ifs ;;
+        * ) st_sep=/ ;;
+      esac
+      { test -r "$_st_basedir$st_sep$0" && _st_myself=$0 && break; } || :
+      _st_basedir=
+      st_sep=
+    done
+    IFS=$st_ifs
+    _st_basedir=$_st_basedir$st_sep
     ;;
 esac
+{ st_sep=; unset st_sep; }
+{ st_prev=; unset st_prev; }
+{ st_ifs=; unset st_ifs; }
 
-# Use a proper internal environment variable to ensure we don'\''t fall
-# into an infinite loop, continuously re-executing ourselves.
-# shellcheck disable=SC2268
-if test x"${_st_can_reexec:-}" != xno && test "x${CONFIG_SHELL:-}" != x; then
-  _st_can_reexec=no; export _st_can_reexec;
-  # We cannot yet assume a decent shell, so we have to provide a
-  # neutralization value for shells without unset; and this also
-  # works around shells that cannot unset nonexistent variables.
-  # Preserve -v and -x to the replacement shell.
-  BASH_ENV=/dev/null
-  ENV=/dev/null
-  (unset BASH_ENV) >/dev/null 2>&1 && unset BASH_ENV ENV
-  case $- in # ((((
-    *v*x* | *x*v* ) st_opts=-vx ;;
-    *v* ) st_opts=-v ;;
-    *x* ) st_opts=-x ;;
-    * ) st_opts= ;;
-  esac
-  # shellcheck disable=SC2248
-  exec ${CONFIG_SHELL} ${st_opts} "${_st_myself}" ${1+"$@"}
-  # Admittedly, this is quite paranoid, since all the known shells bail
-  # out after a failed '\''exec'\''.
-  printf "%s\n" "${0}: could not re-execute WITH ${CONFIG_SHELL}" >&2
-  exit 255
-fi
-# We don'\''t want this to propagate to other subprocesses.
-{ _st_can_reexec=; unset _st_can_reexec; }
+# We did not find ourselves, most probably we were run as `sh COMMAND'\''
+# in which case we are not to be found in the path.
+test "x$_st_myself" != x || _st_myself=$0
+test -f "$_st_myself" ||
+{ printf "%s\n" "$_st_myself: error: cannot find myself; rerun with an absolute file name" >&2; exit 1; }') || :
 
-# shellcheck disable=SC2268
-if test "x${CONFIG_SHELL}" = x; then
-  _st_required="st_fn_return () { (exit \$1); }
-st_fn_success () { st_fn_return 0; }
-st_fn_failure () { st_fn_return 1; }
-st_fn_ret_success () { return 0; }
-st_fn_ret_failure () { return 1; }
-
-exitcode=0
-st_fn_success || { exitcode=1; echo st_fn_success failed.; }
-st_fn_failure && { exitcode=1; echo st_fn_failure succeeded.; }
-st_fn_ret_success || { exitcode=1; echo st_fn_ret_success failed.; }
-st_fn_ret_failure && { exitcode=1; echo st_fn_ret_failure succeeded.; }
-if ( set x; st_fn_ret_success y && test x = \"\$1\" )
-then :
-
-else case e in #(
-  e) exitcode=1; echo positional parameters were not saved. ;;
-esac
-fi
-test x\$exitcode = x0 || exit 1
-blah=\$(echo \$(echo blah))
-test x\"\$blah\" = xblah || exit 1
-test -x / || exit 1"
-  
-  if (eval "${_st_required}") 2>/dev/null
-  then _st_have_required=yes
-  else _st_have_required=no
-  fi
-
-  _st_suggested='\''  _st_lineno_1='\''
-  _st_suggested=${_st_suggested}${LINENO}
-  _st_suggested=${_st_suggested}" _st_lineno_1a=\$LINENO
-_st_lineno_2="
-  _st_suggested=${_st_suggested}${LINENO}
-  _st_suggested=${_st_suggested}" _st_lineno_2a=\$LINENO
-eval '\''test \"x\$_st_lineno_1'\''\$_st_run'\''\" != \"x\$_st_lineno_2'\''\$_st_run'\''\" &&
-test \"x\`expr \$_st_lineno_1'\''\$_st_run'\'' + 1\`\" = \"x\$_st_lineno_2'\''\$_st_run'\''\"'\'' || exit 1"
-  if test "x${_st_have_required}" = xyes && (eval "${_st_suggested}") 2>/dev/null
-  then _st_found=yes
-  else _st_found=no
-  fi
-
-  if test x"${_st_found}" = '\''xno'\'';
-  then :
-    _st_found=false
-    _st_save_IFS="${IFS}"; IFS="${PATH_SEPARATOR}"
-    # shellcheck disable=SC2031
-    for _st_dir in /bin${PATH_SEPARATOR}/usr/bin${PATH_SEPARATOR}${PATH}
-    do
-      IFS="${_st_save_IFS}"
-      case "${_st_dir}" in
-        '\'''\'') _st_dir='\''./'\'' ;;
-        */) ;;
-        *) _st_dir="${_st_dir}/" ;;
-      esac
-      _st_found=:
-      case "${_st_dir}" in
-        /*)
-          for _st_base in sh bash ksh sh5
-          do
-            # Try only shells that exist, to save several forks.
-            _st_shell="${_st_dir}${_st_base}"
-            if { test -f "${_st_shell}" || test -f "${_st_shell}.exe"; } && _st_run=a "${_st_shell}" -c "${_st_bourne_compatible}""${_st_required}" 2>/dev/null
-            then :
-              CONFIG_SHELL="${_st_shell}"
-              _st_have_required=yes
-              if _st_run=a "${_st_shell}" -c "${_st_bourne_compatible}""${_st_suggested}" 2>/dev/null
-              then break 2;
-              fi
-            fi
-          done
-          _st_base=;unset '\''_st_base'\'';
-          _st_shell=;unset '\''_st_shell'\'';
-          ;;
-        *) : ;;
-      esac
-      _st_found=false
-    done
-    IFS="${_st_save_IFS}"
-    _st_save_IFS=;unset '\''_st_save_IFS'\'';
-    _st_dir=;unset '\''_st_dir'\'';
-    
-    if ${_st_found}
-    then :
-    elif test "${SHELL+x}"
-    then :
-      if { test -f "${SHELL}" || test -f "${SHELL}.exe"; } && _st_run=a "${SHELL}" -c "${_st_bourne_compatible}""${_st_required}" 2>/dev/null
-      then :
-        CONFIG_SHELL="${SHELL}"
-        _st_have_required=yes
-      fi
-    else :
-      printf "%s\n" "$0: shell not found";
-      exit 1;
-    fi
-    _st_found=;unset '\''_st_found'\'';
-    _st_bourne_compatible=;unset '\''_st_bourne_compatible'\'';
-
-    if test "x${CONFIG_SHELL}" != x
-    then :
-      export CONFIG_SHELL
-      # We cannot yet assume a decent shell, so we have to provide a
-      # neutralization value for shells without unset; and this also
-      # works around shells that cannot unset nonexistent variables.
-      # Preserve -v and -x to the replacement shell.
-      BASH_ENV=/dev/null
-      ENV=/dev/null
-      (unset BASH_ENV) >/dev/null 2>&1 && unset BASH_ENV ENV
-      case $- in
-        *v*x* | *x*v* ) st_opts=-vx ;;
-        *v* ) st_opts=-v ;;
-        *x* ) st_opts=-x ;;
-        * ) st_opts= ;;
-      esac
-      # shellcheck disable=SC2248
-      exec ${CONFIG_SHELL} ${st_opts} "${_st_myself}" ${1+"$@"}
-      # Admittedly, this is quite paranoid, since all the known shells bail
-      # out after a failed '\''exec'\''.
-      printf "%s\n" "$0: could not re-execute WITH ${CONFIG_SHELL}" >&2
-      exit 255
-    fi
-
-    if test "x${_st_have_required}" = xno
-    then :
-      printf "%s\n" "$0: This script requires a shell more modern than all"
-      printf "%s\n" "$0: the shells that I found on your system."
-      if test ${ZSH_VERSION+y} ; then
-        printf "%s\n" "$0: In particular, zsh ${ZSH_VERSION} has bugs and should"
-        printf "%s\n" "$0: be upgraded to zsh 4.3.4 or later."
-      else
-        printf "%s\n" "$0: Please install a modern shell, or manually run the
-$0: script under such a shell if you do have one."
-      fi
-      exit 1
-    fi
-    _st_have_required=;unset '\''_st_have_required'\'';
-  else :
-  fi
-fi
-
-# re-enable posix compatible shell options previously disabled.
-if test ${st_orig_opts+y} \
-&& test "x${st_orig_opts}" != x \
-&& (set -o) > /dev/null 2>&1
-then
-  for _st_code in '\''f'\'' '\''e'\'' '\''u'\'' '\''C'\''
-  do
-    _st_pat="*[${_st_code}]*"
-    case $st_orig_opts in $_st_pat ) : ;; * ) continue ;; esac
-    case $- in $_st_pat ) continue ;; * ) set "-${_st_code}" ;; esac
-  done
-else :
-fi
-
-# cleanup
-st_orig_opts='\'''\''; unset '\''st_orig_opts'\''
-_st_opts='\'''\''; unset '\''_st_opts'\''
-_st_code='\'''\''; unset '\''_st_code'\''
-_st_pat='\'''\''; unset '\''_st_pat'\''') || :
-
-## shell_sanitize ##
-echo "${st_import}" | grep '^shell_sanitize' >/dev/null 2>&1 &&
+## shell_sanity_check ##
+echo "${st_import}" | grep '^shell_sanity_check' >/dev/null 2>&1 &&
 (eval "${st_import}"; printf '%s\n' '# Copyright (C) 1992-1994, 1998, 2000-2017, 2020-2023 Free Software
 # Foundation, Inc.
 # ----------------------------------------------------------------------------
@@ -415,51 +252,42 @@ echo "${st_import}" | grep '^shell_sanitize' >/dev/null 2>&1 &&
 # original code:
 # https://github.com/autotools-mirror/autoconf/blob/v2.72/lib/m4sugar/m4sh.m4#L551-L564
 
-# shell_sanitize
+# shell_sanity_check
 # -----------------
 # This is a spy to detect "in the wild" shells that do not support shell
 # functions correctly. It is based on the m4sh.at Autotest testcases.
-if (eval '\''as_fn_return () { (exit $1); }
-as_fn_success () { as_fn_return 0; }
-as_fn_failure () { as_fn_return 1; }
-as_fn_ret_success () { return 0; }
-as_fn_ret_failure () { return 1; }
+(eval '\''fn_return () { (exit $1); }
+fn_success () { fn_return 0; }
+fn_failure () { fn_return 1; }
+fn_ret_success () { return 0; }
+fn_ret_failure () { return 1; }
 
 exitcode=0
-as_fn_success || { exitcode=1; echo as_fn_success failed.; }
-as_fn_failure && { exitcode=1; echo as_fn_failure succeeded.; }
-as_fn_ret_success || { exitcode=1; echo as_fn_ret_success failed.; }
-as_fn_ret_failure && { exitcode=1; echo as_fn_ret_failure succeeded.; }
-if ( set x; as_fn_ret_success y && test x = "$1" )
-then :
-else
-  exitcode=1;
-  echo positional parameters were not saved. >&2
-fi
-test x$exitcode = x0 || exit 1'\'') > /dev/null 2>&1
-then :
-else
-  echo shell doesn\'\''t support functions correctly >&2;
-  exit 1;
-fi
+fn_success || { exitcode=1; echo fn_success failed.; }
+fn_failure && { exitcode=1; echo fn_failure succeeded.; }
+fn_ret_success || { exitcode=1; echo fn_ret_success failed.; }
+fn_ret_failure && { exitcode=1; echo fn_ret_failure succeeded.; }
+( set x; fn_ret_success y && test x = "$1" ) ||
+{ exitcode=1; echo positional parameters were not saved.; }
+test x$exitcode = x0 || exit 1'\'') >&2 ||
+{ echo "shell doesn'\''t support functions correctly" >&2; exit 1; }
 
 # This is a spy to detect "in the wild" shells that do not support
 # the newer $(...) form of command substitutions.
-if (eval '\''blah=$(echo $(echo blah))
-test x"$blah" = xblah'\'') > /dev/null 2>&1
-then :
-else
-  echo command substitutions \'\'''\''$(...)'\''\'\'' not supported >&2;
-  exit 2;
-fi
+(eval '\''blah=$(echo $(echo blah))
+test x"$blah" = xblah'\'') > /dev/null 2>&1 ||
+{ echo "shell doesn'\''t support newer substitutions '\''\$(...)'\''" >&2; exit 1; }
 
-# These days, we require that '\''test -x'\'' works.
-if (eval "test -x / || exit 1") > /dev/null 2>&1
-then :
-else
-  echo shell doesn\'\''t support '\''test -x <file>'\'' >&2;
-  exit 3;
-fi') || :
+# Succeed if the currently executing shell supports '\''test -x'\''
+(eval "test -x / || exit 1") > /dev/null 2>&1 ||
+{ echo "shell doesn'\''t support '\''test -x <file>'\''" >&2; exit 1; }
+
+# Succeed if the currently executing shell supports LINENO.
+(v="a=";v=$v$LINENO;v=$v"
+b=";v=$v$LINENO;v=$v'\''
+test "x$a" != "x$b" && test "x`expr $a + 1`" = "x$b" && exit 0
+exit 1'\'';eval "$v") 2>/dev/null ||
+{ echo "shell doesn'\''t support LINENO" >&2; exit 1; }') || :
 
 ## append ##
 echo "${st_import}" | grep '^append' >/dev/null 2>&1 &&
@@ -473,7 +301,7 @@ echo "${st_import}" | grep '^append' >/dev/null 2>&1 &&
 if (eval "st_var=1; st_var+=2; test x\$st_var = x12") 2>/dev/null
 then eval '\'''"${append}"' ()
 {
-  eval "${1}+=\"\${2}\""
+  eval "${1}+=\${2}"
 }'\''
 else '"${append}"' ()
 {
@@ -481,15 +309,92 @@ else '"${append}"' ()
 }
 fi') || :
 
+## locals ##
+echo "${st_import}" | grep '^locals' >/dev/null 2>&1 &&
+(eval "${st_import}"; printf '%s\n' '
+# locals_declare <VAR1> <VAR2> ... <VARN>
+# ----------------------
+# polyfill for '\''local <varname>'\'', for shells that don'\''t support
+# local builtin, it saves the provided variable values and names
+# in a stack prefixed with `_st_locals$NUMBER`, then unset their values,
+# remember to call `locals_release` to restore previous variable values.
+# IMPORTANT: variables with prefix `_st_local` can'\''t be used as local as 
+# they are reserved exclusively to `locals_declare` and `locals_release`
+# methods.
+'"${locals}"'_declare ()
+{
+  test "$#" -gt 0 ||
+  { printf "%s\n" "[ERROR] '"${locals}"'_declare: no variables provided" >&2; return 127; }
+  test "${__st_'"${locals}"'=0}" -ge 0 2> /dev/null ||
+  { printf "%s\n" "[ERROR] '"${locals}"'_declare: '\''__st_'"${locals}"''\'' isn'\''t an integer" >&2; return 127; }
+  if test "$__st_'"${locals}"'" -gt 0
+  then
+    set "x" "$__st_'"${locals}"'" "$@" && shift || return "$?"
+    __st_'"${locals}"'=`expr "1" "+" "$__st_'"${locals}"'" || test "$?" -eq 1` || exit
+    eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''__st_'"${locals}"'=${1};unset \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" && shift || return "$?"
+  else
+    eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''unset \"__st_'"${locals}"'\" \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" || return "$?"
+  fi
+  while test "$#" -gt 0
+  do
+    if eval "test \${$1+y}" 2>/dev/null
+    then
+      test "x$__st_'"${locals}"'" != "x__st_'"${locals}"'" || { shift || exit; continue; }
+      { set x "$__st_'"${locals}"'" "$@" && shift; } || exit
+      __st_'"${locals}"'=`expr "1" "+" "$__st_'"${locals}"'" || test "$?" -eq 1` || exit
+      eval "__st_'"${locals}"'${__st_'"${locals}"'}=\"${2}=\\\$__st_'"${locals}"'${1};\$__st_'"${locals}"'${1} \\\"__st_'"${locals}"'${__st_'"${locals}"'}\\\"\" &&
+      __st_'"${locals}"'${1}=\$${2} &&
+      unset '\''${2}'\''" || exit
+      { shift && shift; } || exit
+    else
+      eval "__st_'"${locals}"'${__st_'"${locals}"'}=\"\$__st_'"${locals}"'${__st_'"${locals}"'} \\\"${1}\\\"\"" && shift || exit
+    fi
+  done
+}
+
+# locals_release [STATUS_CODE]
+# ----------------------
+# Restore previous variable values, optionally accepts a
+# status code as parameter, if provided it returns that
+# status, except in case of error, which may happen if
+# `locals_release` is called without a corresponding
+# `locals_declare`, or when `_st_locals` is invalid.
+'"${locals}"'_release ()
+{
+  { test "${__st_'"${locals}"'+y}" = y && test "x$__st_'"${locals}"'" != x; } ||
+  { printf "%s\n" "[ERROR] '"${locals}"'_release: no corresponding '\'''"${locals}"'_declare'\''" >&2; return 127; }
+  if test "$__st_'"${locals}"'" -gt 0
+  then eval "eval \"\${__st_'"${locals}"'${__st_'"${locals}"'}}\"" || return 127
+  else eval "unset '\''__st_'"${locals}"'${__st_'"${locals}"'}'\''" || return 127
+  fi
+  test "$#" -eq 0 || return "$1"
+}
+__st_'"${locals}"'=
+unset "__st_'"${locals}"'"') || :
+
 ## quote ##
 echo "${st_import}" | grep '^quote' >/dev/null 2>&1 &&
 (eval "${st_import}"; printf '%s\n' '
 # quote <STRING>
 # ----------------------
 # wraps the string in single quotes.
-'"${quote}"' ()
+'"${quote}"' () 
 {
-  printf %s "x${*}x" | sed -e "s/'\''/'\''\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''
+  printf x%sx "$*" | sed "{
+    1s/^x//
+    \$s/x\$//
+    s/[^'\'']*[^'\'']/\\n&\\n/g
+    \$!s/\\n\$//
+    \$!s/'\''\$/'\''\\n/
+    1!s/^\\n//
+    1!s/^'\''/\\n'\''/
+    s/'\''/\\\\&/g
+    s/\\n/'\''/g
+    /^\$/{
+      1s/^/'\''/
+      \$s/\$/'\''/
+    }
+  }"
 }') || :
 
 ## sh_escape ##
@@ -501,13 +406,13 @@ echo "${st_import}" | grep '^sh_escape' >/dev/null 2>&1 &&
 # string can be safely evaluated by shell.
 '"${sh_escape}"' ()
 {
-  while test $# -gt 0; do
+  while test "$#" -gt 0; do
     if tr '\''\n'\'' '\'' '\'' <<EOF | grep '\''^[-[:alnum:]_=,./:]* $'\'' >/dev/null 2>&1
 ${1}
 EOF
     then printf %s "${1}"
     else
-      printf %s "x${1}x" | \
+      printf x%sx "${1}" | \
       sed \
         -n \
         -e '\'':begin'\'' \
@@ -515,15 +420,15 @@ EOF
         -e '\''N'\'' \
         -e '\''bbegin'\'' \
         -e '\'':end'\'' \
-        -e "s/'\''/'\''\\\\'\'''\''/g" \
+        -e "s/'\''/'\''\\\\'\'\''/g" \
         -e "s/^x/'\''/" \
-        -e '\''s/x$/'\''\'\'''\''/'\'' \
-        -e "s#^'\''\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\''\2#" \
+        -e "s/x\$/'\''/" \
+        -e "s#^'\''\\([-[:alnum:]_,./:]*\\)=\\(.*\\)\$#\\1='\''\\2#" \
         -e '\''p'\''
     fi
-    test $# -gt 1 || return 0
+    test "$#" -gt 1 || return 0
     shift 2> /dev/null || return $?
-    printf %s '\'' '\''
+    printf %s " "
   done
 }') || :
 
@@ -535,10 +440,10 @@ echo "${st_import}" | grep '^map' >/dev/null 2>&1 &&
 # Assign each <VALUE> to $1 and eval <CODE>.
 '"${map}"' ()
 {
-  test $# -gt 0 || return 1;
-  eval "while test \$# -gt 1; do
-  shift > /dev/null 2>&1 || return \$?;
-  eval `printf '\''%s\n'\'' "x${1}x" | sed -e "s/'\''/'\''\\\\\\\\'\'''\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'''\''/'\''`
+  test "$#" -gt 0 || return 1;
+  eval "while test \"\$#\" -gt 1; do
+  shift > /dev/null 2>&1 || return 125;
+  eval `printf '\''x%sx\n'\'' "${1}" | sed -e "s/'\''/'\''\\\\\\\\'\'\''/g" -e "1s/^x/'\''/" -e '\''$s/x$/'\''\'\'\''/'\''`
 done
 return 0"
 }') || :
@@ -551,7 +456,7 @@ echo "${st_import}" | grep '^test_varname' >/dev/null 2>&1 &&
 # Check all arguments, check if <STRING> is a valid shell varname
 '"${test_varname}"' ()
 {
-  test $# -gt 0 || return 127
+  test "$#" -gt 0 || return 127
   while :; do
     # https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.72/html_node/Special-Shell-Variables.html
     case ${1} in
@@ -559,7 +464,7 @@ echo "${st_import}" | grep '^test_varname' >/dev/null 2>&1 &&
       [a-zA-Z_]* ) test $# -gt 1 || return 0 ;;
       * ) return 1 ;;
     esac
-    shift 2> /dev/null || return 127
+    shift 2> /dev/null || return 125
   done
 }') || :
 
@@ -579,16 +484,16 @@ echo "${st_import}" | grep '^basename' >/dev/null 2>&1 &&
 #
 # Avoid Solaris 9 /usr/ucb/basename, as '\''basename /'\'' outputs an empty line.
 # Also, traditional basename mishandles --
-if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" = "X/"
+if ('\''base'\'\''name'\'' -- /) >/dev/null 2>&1 && test "X`'\''base'\'\''name'\'' -- / 2>&1`" = "X/"
 then :
 else :
 '"${basename}"' ()
 {
-  test $# -gt 0 || { echo '\''basename: missing operand'\'' >&2; return 127; }
+  test "$#" -gt 0 || { echo '\'''"${basename}"': missing operand'\'' >&2; return 127; }
   if test x"${1}" = '\''x--'\''
   then
-    shift > /dev/null 2>&1 || { echo '\''basename: shift failed'\'' >&2; return 127; }
-    test $# -gt 0 || { echo '\''basename: missing operand'\'' >&2; return 127; }
+    shift > /dev/null 2>&1 || { echo '\'''"${basename}"': shift failed'\'' >&2; return 127; }
+    test "$#" -gt 0 || { echo '\'''"${basename}"': missing operand'\'' >&2; return 127; }
   else :
   fi
 
@@ -627,7 +532,7 @@ echo "${st_import}" | grep '^pushvar' >/dev/null 2>&1 &&
 # push a value into the stack <VAR>, if the stack doesn'\''t exists, create one.
 '"${pushvar}"' ()
 {
-  while test $# -gt 0; do
+  while test "$#" -gt 0; do
     # Check stack varname
     case ${1} in
       [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
@@ -641,11 +546,11 @@ echo "${st_import}" | grep '^pushvar' >/dev/null 2>&1 &&
     eval "test \"\${${1}_level:=0}\" -ge 0" 2> /dev/null ||
     { printf %s\\n "invalid '\''${1}_level'\'': not an integer" >&2; return 127; }
     # assign value to stack
-    eval "eval \"${1}_\${${1}_level}=\\\"\\\${${1}}\\\"\"" || return 127
+    eval "eval \"${1}_\${${1}_level}=\\\"\\\${${1}}\\\"\"" || return 125
     # increment stack level
-    eval "${1}_level=\$(( 1 + \${${1}_level} ))" || return 127
-    test $# -gt 1 || return 0
-    shift 2> /dev/null || return 127
+    eval "${1}_level=\$(( 1 + \${${1}_level} ))" || return 125
+    test "$#" -gt 1 || return 0
+    shift 2> /dev/null || return 125
   done
 }') || :
 
@@ -657,7 +562,7 @@ echo "${st_import}" | grep '^popvar' >/dev/null 2>&1 &&
 # pops a value from the stack and assign it to <VAR>
 '"${popvar}"' ()
 {
-  while test $# -gt 0; do
+  while test "$#" -gt 0; do
     # Check stack varname
     case ${1} in
       [0-9_] | [!a-zA-Z_]* | *[!a-zA-Z0-9_]* ) :
@@ -670,13 +575,13 @@ echo "${st_import}" | grep '^popvar' >/dev/null 2>&1 &&
     # check if the stack is empty
     eval "test \"\${${1}_level:-0}\" -gt 0" || return 1
     # decrement stack level
-    eval "${1}_level=\$(( \${${1}_level} - 1 ))" || return 127
+    eval "${1}_level=\$(( \${${1}_level} - 1 ))" || return 125
     # assign stack item to ${1}
     eval "eval \"${1}=\\\"\\\${${1}_\${${1}_level}:=}\\\"\""
     # unset stack value
     eval "unset \"${1}_\${${1}_level}\"" 2> /dev/null || :
-    test $# -gt 1 || return 0
-    shift 2> /dev/null || return $?
+    test "$#" -gt 1 || return 0
+    shift 2> /dev/null || return 125
   done
 }') || :
 
@@ -689,14 +594,14 @@ echo "${st_import}" | grep '^clean_dir' >/dev/null 2>&1 &&
 # subdirectories, but leave DIR itself untouched.
 '"${clean_dir}"' ()
 {
-  test $# -eq 1 || return 127;
+  test "$#" -eq 1 || return 127;
   test "x${1}" != x || { printf '\''%s\n'\'' "directory name is empty" >&2; return 127; };
   test -d "${1}" || { printf '\''%s\n'\'' "directory not found '\''${1}'\''" >&2; return 1; };
 
   # Check if the directory is empty
   # ref: https://www.etalabs.net/sh_tricks.html
   # (
-  case "$-" in
+  case $- in
     *f* ) printf '\''%s\n'\'' "pathname expansion is disabled, please enable it '\''set +f'\''" >&2; return 127 ;;
     * ) : ;;
   esac
@@ -728,18 +633,18 @@ echo "${st_import}" | grep '^dirname' >/dev/null 2>&1 &&
 # ---------------------
 # Polyfill for the command '\''dirname FILE-NAME'\''. Not all systems have
 # dirname.
-if (st_dir=`dirname -- /` && test "X$st_dir" = X/) >/dev/null 2>&1;
+if (st_dir=`'\''dir'\'\''name'\'' -- /` && test "X$st_dir" = X/) >/dev/null 2>&1;
 then :
 else '"${dirname}"' ()
 {
-  test $# -gt 0 ||
-  { echo '\''dirname: missing operand'\'' >&2; return 127; };
+  test "$#" -gt 0 ||
+  { echo '\'''"${dirname}"': missing operand'\'' >&2; return 127; };
   if test x"${1}" = '\''x--'\''
   then
     shift > /dev/null ||
-    { echo '\''dirname: shift failed'\'' >&2; return 127; };
-    test $# -gt 0 ||
-    { echo '\''dirname: missing operand'\'' >&2; return 127; };
+    { echo '\'''"${dirname}"': shift failed'\'' >&2; return 127; };
+    test "$#" -gt 0 ||
+    { echo '\'''"${dirname}"': missing operand'\'' >&2; return 127; };
   else :
   fi
 
@@ -783,7 +688,7 @@ echo "${st_import}" | grep '^str_to_varname' >/dev/null 2>&1 &&
 # Transform <STRING> into a valid shell variable name.
 '"${str_to_varname}"' ()
 {
-  test $# -eq 1 || return 127;
+  test "$#" -eq 1 || return 127;
 
   # Avoid depending upon Character Ranges.
   printf '\''%s\n'\'' "${1}" | sed '\''y%*+%pp%;s%[^_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]%_%g'\''
@@ -834,7 +739,7 @@ elif (eval "test \$(( 1 + 1 )) = 2") 2>/dev/null
 then eval '\'''"${unix_timestamp}"' ()
 {
 printf %s\\n $((`TZ=GMT0 LANGUAGE=C LC_ALL=C date \
-'\''\'\'''\''+((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400+1%j-1000-135140)*86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)'\''\'\'''\''`))
+'\''\'\'\''+((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400+1%j-1000-135140)*86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)'\''\'\'\''`))
 }'\''
 else '"${unix_timestamp}"' ()
 { 
@@ -842,7 +747,7 @@ else '"${unix_timestamp}"' ()
 eval "${d}" 2> /dev/null && \
 expr \( \( $y \- 1600 \) \* 365 \+ \( $y \- 1600 \) \/ 4 \- \( $y \- 1600 \) \/ 100 \+ \( $y \- 1600 \) \/ 400 \+ $j \- 1000 \- 135140 \) \* 86400 \+ \( $h \- 100 \) \* 3600 \+ \( $m \- 100 \) \* 60 \+ \( $s \- 100 \))
 }
-fi # unix_timestamp') || :
+fi # '"${unix_timestamp}"'') || :
 
 ## version_compare ##
 echo "${st_import}" | grep '^version_compare' >/dev/null 2>&1 &&
@@ -868,7 +773,7 @@ echo "${st_import}" | grep '^version_compare' >/dev/null 2>&1 &&
 # so don'\''t worry about finding a "nice" awk version.
 '"${version_compare}"' ()
 {
-  test $# -eq 3 || { printf '\''%s\n'\'' "usage: version_compare <V1> [-eq|-ne|-gt|-ge|-lt|-le] <V2>
+  test "$#" -eq 3 || { printf '\''%s\n'\'' "usage: '"${version_compare}"' <V1> [-eq|-ne|-gt|-ge|-lt|-le] <V2>
 expected 3 arguments, provided $#" >&2; return 127; }
 
   # Internaly all operators are converted to integers with prime factors
