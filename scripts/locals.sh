@@ -51,10 +51,7 @@ locals_release ()
 {
   { test "${__st_locals+y}" = y && test "x$__st_locals" != x; } ||
   { printf "%s\n" "[ERROR] locals_release: no corresponding 'locals_declare'" >&2; return 127; }
-  if test "$__st_locals" -gt 0
-  then eval "eval \"\${__st_locals${__st_locals}}\"" || return 127
-  else eval "unset '__st_locals${__st_locals}'" || return 127
-  fi
+  eval "eval \"\${__st_locals${__st_locals}}\"" || return 127
   test "$#" -eq 0 || return "$1"
 }
 __st_locals=

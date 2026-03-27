@@ -140,15 +140,6 @@ _st_quote_file()
         }
       }
     }" < "${3}" || { printf %s\\n "sed failed $?" >&2; exit 1; }
-  # quote < "${3}"
-  # sed \
-  #   -e '1d' \
-  #   -e "s/'/'\\\\''/g" \
-  #   -e "s/${2}/'\"\$\\{${1}\\}\"'/" \
-  #   -e "2s/^/'/" \
-  #   -e "\$s/\$/'/" \
-  #   -e "s#^'\\([-[:alnum:]_,./:]*\\)=\\(.*\\)\$#\\1='\\2#" < "${3}" ||
-  # { printf %s\\n "sed failed $?" >&2; exit 1; }
 }
 
 # _st_import <ALIAS> <METHOD> <FILE>
@@ -189,10 +180,6 @@ sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
 test \${\${1}+y} &&
 test x"\${\${1}}" != 'x' || \${1}=${v}
 EOF
-
-
-# ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '
-# '` || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }
 
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
 # Remove whitespaces
