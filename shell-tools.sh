@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-62c2a3b
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-4baad8f
 # COMMAND: build.sh --import=st_import --output=./shell-tools.sh
 #    DATE: 2026-03-27
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: 5cdad0e1bf22db4bb1224152beaf5ecee4169f6ce7374ee413ad25958a100d02
+#  SHA256: e92ddc6ddc43ed0ea01ecc4372f8394a0077bf45bdbe438c3132631ed777f15f
 
 ##################
 ## SCRIPT START ##
@@ -95,10 +95,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-62c2a3b
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-4baad8f
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: 5cdad0e1bf22db4bb1224152beaf5ecee4169f6ce7374ee413ad25958a100d02
+# SHA256: e92ddc6ddc43ed0ea01ecc4372f8394a0077bf45bdbe438c3132631ed777f15f
 
 EOLHEADER
 
@@ -363,10 +363,7 @@ echo "${st_import}" | grep '^locals' >/dev/null 2>&1 &&
 {
   { test "${__st_'"${locals}"'+y}" = y && test "x$__st_'"${locals}"'" != x; } ||
   { printf "%s\n" "[ERROR] '"${locals}"'_release: no corresponding '\'''"${locals}"'_declare'\''" >&2; return 127; }
-  if test "$__st_'"${locals}"'" -gt 0
-  then eval "eval \"\${__st_'"${locals}"'${__st_'"${locals}"'}}\"" || return 127
-  else eval "unset '\''__st_'"${locals}"'${__st_'"${locals}"'}'\''" || return 127
-  fi
+  eval "eval \"\${__st_'"${locals}"'${__st_'"${locals}"'}}\"" || return 127
   test "$#" -eq 0 || return "$1"
 }
 __st_'"${locals}"'=
