@@ -56,7 +56,7 @@ test -f './build.sh' ||
 
 # 4. Load required shell scripts.
 _scripts='./scripts/bourne_compatible.sh
-./scripts/shell_sanitize.sh
+./scripts/shell_sanity_check.sh
 ./scripts/append.sh
 ./scripts/quote.sh
 ./scripts/sh_escape.sh
@@ -120,13 +120,34 @@ _st_quote_file()
   test -f "${3}" ||
   { printf %s\\n "file not found '${3}'" >&2; exit 1; }
   sed \
-    -e '1d' \
-    -e "s/'/'\\\\''/g" \
-    -e "s/${2} ()/'\"\$\{${1}\}\"' ()/" \
-    -e "2s/^/'/" \
-    -e "\$s/\$/'/" \
-    -e "s#^'\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\2#" < "${3}" ||
-  { printf %s\\n "sed failed $?" >&2; exit 1; }
+    -e "{
+      1d
+      s/[^']*[^']/\\n&\\n/g
+      \$!s/\\n\$//
+      \$!s/'\$/'\\n/
+      2!s/^\\n//
+      2!s/^'/\\n'/
+      s/'/\\\\&/g
+      s/\\n/'/g
+      /^\$/{
+        2s/^/'/
+        \$s/\$/'/
+      }
+      /${2}/{
+        /^[ ]*\\#/!{
+          s/${2}/'\"\$\\{${1}\\}\"'/g
+        }
+      }
+    }" < "${3}" || { printf %s\\n "sed failed $?" >&2; exit 1; }
+  # quote < "${3}"
+  # sed \
+  #   -e '1d' \
+  #   -e "s/'/'\\\\''/g" \
+  #   -e "s/${2}/'\"\$\\{${1}\\}\"'/" \
+  #   -e "2s/^/'/" \
+  #   -e "\$s/\$/'/" \
+  #   -e "s#^'\\([-[:alnum:]_,./:]*\\)=\\(.*\\)\$#\\1='\\2#" < "${3}" ||
+  # { printf %s\\n "sed failed $?" >&2; exit 1; }
 }
 
 # _st_import <ALIAS> <METHOD> <FILE>
@@ -155,20 +176,38 @@ echo \"\${${1}}\" | grep '^${2}' >/dev/null 2>&1 &&
 _st_header()
 {
 v=''
-map 'append v "${1%%=*}${nl}"' ${_scripts}
+# map 'append v "${1%%=*}${nl}"' ${_scripts}
+map 'append v "$(expr "X$1" : '\''X\([^=]*\)=.*'\'')"
+test $# -eq 1 || append v "${nl}"' ${_scripts}
+
 v="$(quote "${v}")${nl}"
 
 sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<EOF
 ##################
 ## SCRIPT START ##
 ##################
-test x"\${\${1}:-}" != 'x' || \${1}=${v}
+test \${\${1}+y} &&
+test x"\${\${1}}" != 'x' || \${1}=${v}
 EOF
+
+
+# ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '
+# '` || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }
 
 sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
 # Remove whitespaces
-${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr '[\000-\040\176-\377]' '
-'` || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }
+case `printf '%bX%b' '\141' '\x61' 2> /dev/null` in
+  aX*) :
+    { ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr '[\001-\040\176-\377]' "
+"` || printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; } ;;
+  *Xa) :
+    { ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr '[\x01-\x20\x76\xfe]' "
+"` || printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; } ;;
+  *) :
+    { ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr " ""	
+" "
+"` || printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; } ;;
+esac
 
 # Parse options
 ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C sed -n \

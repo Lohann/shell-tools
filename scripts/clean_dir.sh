@@ -6,14 +6,14 @@
 # subdirectories, but leave DIR itself untouched.
 clean_dir ()
 {
-  test $# -eq 1 || return 127;
+  test "$#" -eq 1 || return 127;
   test "x${1}" != x || { printf '%s\n' "directory name is empty" >&2; return 127; };
   test -d "${1}" || { printf '%s\n' "directory not found '${1}'" >&2; return 1; };
 
   # Check if the directory is empty
   # ref: https://www.etalabs.net/sh_tricks.html
   # (
-  case "$-" in
+  case $- in
     *f* ) printf '%s\n' "pathname expansion is disabled, please enable it 'set +f'" >&2; return 127 ;;
     * ) : ;;
   esac

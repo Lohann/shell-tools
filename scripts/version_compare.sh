@@ -21,7 +21,7 @@
 # so don't worry about finding a "nice" awk version.
 version_compare ()
 {
-  test $# -eq 3 || { printf '%s\n' "usage: version_compare <V1> [-eq|-ne|-gt|-ge|-lt|-le] <V2>
+  test "$#" -eq 3 || { printf '%s\n' "usage: version_compare <V1> [-eq|-ne|-gt|-ge|-lt|-le] <V2>
 expected 3 arguments, provided $#" >&2; return 127; }
 
   # Internaly all operators are converted to integers with prime factors

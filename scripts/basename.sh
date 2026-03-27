@@ -13,16 +13,16 @@
 #
 # Avoid Solaris 9 /usr/ucb/basename, as 'basename /' outputs an empty line.
 # Also, traditional basename mishandles --
-if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" = "X/"
+if ('base''name' -- /) >/dev/null 2>&1 && test "X`'base''name' -- / 2>&1`" = "X/"
 then :
 else :
 basename ()
 {
-  test $# -gt 0 || { echo 'basename: missing operand' >&2; return 127; }
+  test "$#" -gt 0 || { echo 'basename: missing operand' >&2; return 127; }
   if test x"${1}" = 'x--'
   then
     shift > /dev/null 2>&1 || { echo 'basename: shift failed' >&2; return 127; }
-    test $# -gt 0 || { echo 'basename: missing operand' >&2; return 127; }
+    test "$#" -gt 0 || { echo 'basename: missing operand' >&2; return 127; }
   else :
   fi
 

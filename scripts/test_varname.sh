@@ -5,7 +5,7 @@
 # Check all arguments, check if <STRING> is a valid shell varname
 test_varname ()
 {
-  test $# -gt 0 || return 127
+  test "$#" -gt 0 || return 127
   while :; do
     # https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.72/html_node/Special-Shell-Variables.html
     case ${1} in
@@ -13,6 +13,6 @@ test_varname ()
       [a-zA-Z_]* ) test $# -gt 1 || return 0 ;;
       * ) return 1 ;;
     esac
-    shift 2> /dev/null || return 127
+    shift 2> /dev/null || return 125
   done
 }

@@ -10,17 +10,17 @@
 # ---------------------
 # Polyfill for the command 'dirname FILE-NAME'. Not all systems have
 # dirname.
-if (st_dir=`dirname -- /` && test "X$st_dir" = X/) >/dev/null 2>&1;
+if (st_dir=`'dir''name' -- /` && test "X$st_dir" = X/) >/dev/null 2>&1;
 then :
 else dirname ()
 {
-  test $# -gt 0 ||
+  test "$#" -gt 0 ||
   { echo 'dirname: missing operand' >&2; return 127; };
   if test x"${1}" = 'x--'
   then
     shift > /dev/null ||
     { echo 'dirname: shift failed' >&2; return 127; };
-    test $# -gt 0 ||
+    test "$#" -gt 0 ||
     { echo 'dirname: missing operand' >&2; return 127; };
   else :
   fi

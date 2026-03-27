@@ -9,7 +9,7 @@
 if (eval "st_var=1; st_var+=2; test x\$st_var = x12") 2>/dev/null
 then eval 'append ()
 {
-  eval "${1}+=\"\${2}\""
+  eval "${1}+=\${2}"
 }'
 else append ()
 {
