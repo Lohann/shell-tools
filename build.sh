@@ -177,7 +177,6 @@ echo \"\${${1}}\" | grep '^${2}' >/dev/null 2>&1 &&
 _st_header()
 {
 v=''
-# map 'append v "${1%%=*}${nl}"' ${_scripts}
 map 'append v "$(expr "X$1" : '\''X\([^=]*\)=.*'\'')"
 test $# -eq 1 || append v "${nl}"' ${_scripts}
 
@@ -235,7 +234,7 @@ for v in \${_imports}
 do case \${v} in
   \$st_case ) eval \"_st_error=\\\"\\\${_st_error}invalid option \\\"\${v}'
 '\"; continue ;;
-  *=* ) a=\"\${v%%[=]*}\" ;;
+  *=* ) a=\`expr "X\$v" : 'X\([^=]*\)=.*'\` ;;
   * ) a=\"\${v}\" ;;
 esac
 case \"\${a}\" in
