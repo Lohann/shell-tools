@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-4baad8f
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-9c47f66
 # COMMAND: build.sh --import=st_import --output=./shell-tools.sh
 #    DATE: 2026-03-27
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: e92ddc6ddc43ed0ea01ecc4372f8394a0077bf45bdbe438c3132631ed777f15f
+#  SHA256: a7eb0e09f13ff3c87f12aa2970d6712d5ea0e1efaf02e50b4ec1deba969f6126
 
 ##################
 ## SCRIPT START ##
@@ -95,10 +95,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-4baad8f
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-9c47f66
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: e92ddc6ddc43ed0ea01ecc4372f8394a0077bf45bdbe438c3132631ed777f15f
+# SHA256: a7eb0e09f13ff3c87f12aa2970d6712d5ea0e1efaf02e50b4ec1deba969f6126
 
 EOLHEADER
 
@@ -196,17 +196,15 @@ st_prev=
 st_ifs=$IFS
 case $0 in
   *[\\/]* )
-    case $0 in *?/ ) _st_myself=$0/ ;; * ) _st_myself=$0 ;; esac
     st_sep= st_prev= _st_basedir= IFS=/
-    for _st_myself in $_st_myself
+    for _st_myself in $0
     do
-      _st_basedir=$_st_basedir$st_sep
+      _st_basedir=$_st_basedir$st_prev
       st_prev=$st_sep$_st_myself
       st_sep=/
     done
     IFS=$st_ifs
     test "x$_st_basedir" != x || { _st_basedir=$st_sep; st_sep=;}
-    _st_basedir=$_st_basedir$st_sep
     ;;
   *)
     _st_myself=
@@ -230,18 +228,20 @@ case $0 in
       st_sep=
     done
     IFS=$st_ifs
-    _st_basedir=$_st_basedir$st_sep
     ;;
 esac
-{ st_sep=; unset st_sep; }
-{ st_prev=; unset st_prev; }
-{ st_ifs=; unset st_ifs; }
 
 # We did not find ourselves, most probably we were run as `sh COMMAND'\''
 # in which case we are not to be found in the path.
 test "x$_st_myself" != x || _st_myself=$0
-test -f "$_st_myself" ||
-{ printf "%s\n" "$_st_myself: error: cannot find myself; rerun with an absolute file name" >&2; exit 1; }') || :
+test -f "$_st_basedir$st_sep$_st_myself" ||
+{ printf "%s\n" "$_st_myself: error: cannot find myself; rerun with an absolute file name" >&2; exit 1; }
+test -d "$_st_basedir" ||
+{ printf "%s\n" "$_st_basedir: error: cannot find base directory; rerun with an absolute file name" >&2; exit 1; }
+_st_basedir=$_st_basedir$st_sep
+{ st_sep=; unset st_sep; }
+{ st_prev=; unset st_prev; }
+{ st_ifs=; unset st_ifs; }') || :
 
 ## shell_sanity_check ##
 echo "${st_import}" | grep '^shell_sanity_check' >/dev/null 2>&1 &&
@@ -329,7 +329,7 @@ echo "${st_import}" | grep '^locals' >/dev/null 2>&1 &&
   { printf "%s\n" "[ERROR] '"${locals}"'_declare: '\''__st_'"${locals}"''\'' isn'\''t an integer" >&2; return 127; }
   if test "$__st_'"${locals}"'" -gt 0
   then
-    set "x" "$__st_'"${locals}"'" "$@" && shift || return 125
+    set x "$__st_'"${locals}"'" "$@" && shift || return 125
     __st_'"${locals}"'=`expr "1" "+" "$__st_'"${locals}"'" || test "$?" -eq 1` || return 125
     eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''__st_'"${locals}"'=${1};unset \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" && shift || return 125
   else
