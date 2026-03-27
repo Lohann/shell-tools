@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-04b7350
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-62c2a3b
 # COMMAND: build.sh --import=st_import --output=./shell-tools.sh
 #    DATE: 2026-03-27
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: df947a210ca4a6c0dd149064b8be1c99c8b208695c7f4c99577758376ca495b8
+#  SHA256: 5cdad0e1bf22db4bb1224152beaf5ecee4169f6ce7374ee413ad25958a100d02
 
 ##################
 ## SCRIPT START ##
@@ -65,7 +65,7 @@ for v in ${_imports}
 do case ${v} in
   $st_case ) eval "_st_error=\"\${_st_error}invalid option \"${v}'\''
 '\''"; continue ;;
-  *=* ) a="${v%%[=]*}" ;;
+  *=* ) a=`expr X$v : '\''X\([^=]*\)=.*'\''` ;;
   * ) a="${v}" ;;
 esac
 case "${a}" in
@@ -95,10 +95,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-04b7350
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-62c2a3b
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: df947a210ca4a6c0dd149064b8be1c99c8b208695c7f4c99577758376ca495b8
+# SHA256: 5cdad0e1bf22db4bb1224152beaf5ecee4169f6ce7374ee413ad25958a100d02
 
 EOLHEADER
 
