@@ -17,25 +17,25 @@ locals_declare ()
   { printf "%s\n" "[ERROR] locals_declare: '__st_locals' isn't an integer" >&2; return 127; }
   if test "$__st_locals" -gt 0
   then
-    set "x" "$__st_locals" "$@" && shift || return "$?"
-    __st_locals=`expr "1" "+" "$__st_locals" || test "$?" -eq 1` || exit
-    eval "__st_locals${__st_locals}='__st_locals=${1};unset \"__st_locals${__st_locals}\"'" && shift || return "$?"
+    set "x" "$__st_locals" "$@" && shift || return 125
+    __st_locals=`expr "1" "+" "$__st_locals" || test "$?" -eq 1` || return 125
+    eval "__st_locals${__st_locals}='__st_locals=${1};unset \"__st_locals${__st_locals}\"'" && shift || return 125
   else
-    eval "__st_locals${__st_locals}='unset \"__st_locals\" \"__st_locals${__st_locals}\"'" || return "$?"
+    eval "__st_locals${__st_locals}='unset \"__st_locals\" \"__st_locals${__st_locals}\"'" || return 125
   fi
   while test "$#" -gt 0
   do
     if eval "test \${$1+y}" 2>/dev/null
     then
-      test "x$__st_locals" != "x__st_locals" || { shift || exit; continue; }
-      { set x "$__st_locals" "$@" && shift; } || exit
-      __st_locals=`expr "1" "+" "$__st_locals" || test "$?" -eq 1` || exit
+      test "x$__st_locals" != "x__st_locals" || { shift || return 125; continue; }
+      { set x "$__st_locals" "$@" && shift; } || return 125
+      __st_locals=`expr "1" "+" "$__st_locals" || test "$?" -eq 1` || return 125
       eval "__st_locals${__st_locals}=\"${2}=\\\$__st_locals${1};\$__st_locals${1} \\\"__st_locals${__st_locals}\\\"\" &&
       __st_locals${1}=\$${2} &&
-      unset '${2}'" || exit
-      { shift && shift; } || exit
+      unset '${2}'" || return 125
+      { shift && shift; } || return 125
     else
-      eval "__st_locals${__st_locals}=\"\$__st_locals${__st_locals} \\\"${1}\\\"\"" && shift || exit
+      eval "__st_locals${__st_locals}=\"\$__st_locals${__st_locals} \\\"${1}\\\"\"" && shift || return 125
     fi
   done
 }
