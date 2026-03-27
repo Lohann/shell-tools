@@ -58,6 +58,7 @@ test -f './build.sh' ||
 _scripts='./scripts/bourne_compatible.sh
 ./scripts/shell_sanity_check.sh
 ./scripts/append.sh
+./scripts/locals.sh
 ./scripts/quote.sh
 ./scripts/sh_escape.sh
 ./scripts/map.sh
@@ -199,14 +200,14 @@ sed -e "s/'/'\\\\''/g" -e "s/\\\${1}/'\"\\\${1}\"'/g" <<'EOF'
 case `printf '%bX%b' '\141' '\x61' 2> /dev/null` in
   aX*) :
     { ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr '[\001-\040\176-\377]' "
-"` || printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; } ;;
+"` || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }; } ;;
   *Xa) :
     { ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr '[\x01-\x20\x76\xfe]' "
-"` || printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; } ;;
+"` || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }; } ;;
   *) :
     { ${1}=`printf '%s\n' "${${1}}" | LC_ALL=C LANGUAGE=C tr " ""	
 " "
-"` || printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; } ;;
+"` || { printf '%s\n' "[ERROR] tr failed '${${1}}'" >&2; exit 1; }; } ;;
 esac
 
 # Parse options
