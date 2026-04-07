@@ -25,7 +25,7 @@
 # - printf_colors '@E\n' 'red+bold'
 # - printf_colors '@W\n' 'yellow+bold'
 # - printf_colors '@E @w %s @b @W @e @w\n' 'all' 'colors' 'mixed' 'in' 'the' 'same' 'text'
-if test -t 1 && (tput colors && colors=`tput colors` && test "x$colors" != 'x' && test "$colors" -ge 8) >/dev/null 2>&1
+if test -t 1 && (tput colors && colors=`tput colors` && test "x$colors" != 'x' && test 8 -le "$colors") >/dev/null 2>&1
 then
   # Eval is used to hardcode the escape sequences in the function body,
   # so it doesn't need to rely on global variables for storing colors.

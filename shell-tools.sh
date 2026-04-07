@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-85980df
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-ab4b683
 # COMMAND: build.sh --import=st_import --output=./shell-tools.sh
 #    DATE: 2026-04-07
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: 35fa5fbc07c5b9d6f8006bbf37685adda8713f725f53479aab2eafb8a99ec507
+#  SHA256: 3ca59515290a6901497e7d804f235a961ecd8360254fc63a96fd4cf40755f111
 
 ##################
 ## SCRIPT START ##
@@ -97,10 +97,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-85980df
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-ab4b683
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: 35fa5fbc07c5b9d6f8006bbf37685adda8713f725f53479aab2eafb8a99ec507
+# SHA256: 3ca59515290a6901497e7d804f235a961ecd8360254fc63a96fd4cf40755f111
 
 EOLHEADER
 
@@ -379,16 +379,16 @@ echo "${st_import}" | grep '^quote' >/dev/null 2>&1 &&
 # wraps the string in single quotes.
 '"${quote}"' () 
 {
-  printf x%sx "$*" | sed "{
+  printf x%sx "$*" | LC_ALL=C sed "{
     1s/^x//
     \$s/x\$//
-    s/[^'\'']*[^'\'']/\\n&\\n/g
-    \$!s/\\n\$//
-    \$!s/'\''\$/'\''\\n/
-    1!s/^\\n//
-    1!s/^'\''/\\n'\''/
+    s/[^'\'']*[^'\'']/\\x0a&\\x0a/g
+    \$!s/\\x0a\$//
+    \$!s/'\''\$/'\''\\x0a/
+    1!s/^\\x0a//
+    1!s/^'\''/\\x0a'\''/
     s/'\''/\\\\&/g
-    s/\\n/'\''/g
+    s/\\x0a/'\''/g
     /^\$/{
       1s/^/'\''/
       \$s/\$/'\''/
@@ -707,7 +707,7 @@ echo "${st_import}" | grep '^printf_colors' >/dev/null 2>&1 &&
 # - printf_colors '\''@E\n'\'' '\''red+bold'\''
 # - printf_colors '\''@W\n'\'' '\''yellow+bold'\''
 # - printf_colors '\''@E @w %s @b @W @e @w\n'\'' '\''all'\'' '\''colors'\'' '\''mixed'\'' '\''in'\'' '\''the'\'' '\''same'\'' '\''text'\''
-if test -t 1 && (tput colors && colors=`tput colors` && test "x$colors" != '\''x'\'' && test "$colors" -ge 8) >/dev/null 2>&1
+if test -t 1 && (tput colors && colors=`tput colors` && test "x$colors" != '\''x'\'' && test 8 -le "$colors") >/dev/null 2>&1
 then
   # Eval is used to hardcode the escape sequences in the function body,
   # so it doesn'\''t need to rely on global variables for storing colors.
