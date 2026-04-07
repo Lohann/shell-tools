@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-ab4b683
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-69c0672
 # COMMAND: build.sh --import=st_import --output=./shell-tools.sh
 #    DATE: 2026-04-07
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: 3ca59515290a6901497e7d804f235a961ecd8360254fc63a96fd4cf40755f111
+#  SHA256: cdd3b9e215d2fe67b07e50a10da2b18213910a6b5a2e897210f07f8077d91297
 
 ##################
 ## SCRIPT START ##
@@ -97,10 +97,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-ab4b683
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-69c0672
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: 3ca59515290a6901497e7d804f235a961ecd8360254fc63a96fd4cf40755f111
+# SHA256: cdd3b9e215d2fe67b07e50a10da2b18213910a6b5a2e897210f07f8077d91297
 
 EOLHEADER
 
@@ -377,8 +377,30 @@ echo "${st_import}" | grep '^quote' >/dev/null 2>&1 &&
 # quote <STRING>
 # ----------------------
 # wraps the string in single quotes.
-'"${quote}"' () 
+#
+# The most common approach to escape single quotes in a string is by replace them 
+# with '\''\'\'\'' (quote, slash, quote, quote), unfortunately this naive approach also
+# may add lots of useless quotes if the original value has consecutive single quotes
+# or begins/ends with single quotes. The logic implemented by this function
+# takes that into consideration and never adds useless quotes.
+#
+# Example:
+# naive_quote() {
+#   printf %s "$1" | sed -e "s/'\''/'\''\\\\'\'\''/g" -e "1s/^/'\''/" -e '\''$s/$/'\''\'\'\''/'\''
+# }
+#
+# original value: '\'\'\''some'\'\'\''value'\'\'\''
+#   naive escape: '\'\''\'\'\'\''\'\'\'\''\'\'\''some'\''\'\'\'\''\'\'\'\''\'\'\''value'\''\'\'\'\''\'\'\'\''\'\'\'\''
+#  better escape: \'\''\'\''\'\'\''some'\''\'\''\'\''\'\'\''value'\''\'\''\'\''\'\''
+# 
+# '\''better'\'' and '\''naive'\'' are the same value, you can verify it by running:
+# a='\'\''\'\'\'\''\'\'\'\''\'\'\''some'\''\'\'\'\''\'\'\'\''\'\'\''value'\''\'\'\'\''\'\'\'\''\'\'\'\''
+# b=\'\''\'\''\'\'\''some'\''\'\''\'\''\'\'\''value'\''\'\''\'\''\'\''
+# test "$a" = "$b" && echo '\''A and B are equal!'\''
+'"${quote}"' ()
 {
+  # The two x'\''s in the printf is a tricky to prevent `sed` 
+  # from removing leading and trailing spaces.
   printf x%sx "$*" | LC_ALL=C sed "{
     1s/^x//
     \$s/x\$//
@@ -684,7 +706,7 @@ echo "${st_import}" | grep '^printf_colors' >/dev/null 2>&1 &&
 (eval "${st_import}"; printf '%s\n' '
 # printf_colors FMT ...ARGS
 # ----------------------------------------
-# Extend printf escape sequences to supports colors.
+# Extend printf escape sequences to support colors.
 # if available uses `tput` to detect if the current
 # terminal supports colors, then query a default escape
 # sequences for errors (red), warnings (yellow) and bold.

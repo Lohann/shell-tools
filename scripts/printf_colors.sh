@@ -2,7 +2,7 @@
 
 # printf_colors FMT ...ARGS
 # ----------------------------------------
-# Extend printf escape sequences to supports colors.
+# Extend printf escape sequences to support colors.
 # if available uses `tput` to detect if the current
 # terminal supports colors, then query a default escape
 # sequences for errors (red), warnings (yellow) and bold.
