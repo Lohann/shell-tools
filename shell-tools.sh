@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-69c0672
+# FILE AUTO-GENERATED USING SHELL-TOOLS v0.1.0-8273199
 # COMMAND: build.sh --import=st_import --output=./shell-tools.sh
-#    DATE: 2026-04-07
+#    DATE: 2026-04-08
 #  SOURCE: https://github.com/Lohann/shell-tools
-#  SHA256: cdd3b9e215d2fe67b07e50a10da2b18213910a6b5a2e897210f07f8077d91297
+#  SHA256: c5345d6f740d968f5ec46acbae858fcf557ae21a64ca903e924a0c0e1e515f04
 
 ##################
 ## SCRIPT START ##
@@ -97,10 +97,10 @@ test "X${_st_error}" = X || { printf "%s\n%s" "[ERROR] invalid options:" "${_st_
 # display file header
 cat <<EOLHEADER
 #!/bin/sh
-# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-69c0672
+# THIS FILE WAS AUTO-GENERATED USING SHELL-TOOLS v0.1.0-8273199
 #   DATE: `TZ=GMT0 LANGUAGE=C LC_ALL=C date '+%Y-%m-%d'`
 # SOURCE: https://github.com/Lohann/shell-tools
-# SHA256: cdd3b9e215d2fe67b07e50a10da2b18213910a6b5a2e897210f07f8077d91297
+# SHA256: c5345d6f740d968f5ec46acbae858fcf557ae21a64ca903e924a0c0e1e515f04
 
 EOLHEADER
 
@@ -327,14 +327,13 @@ echo "${st_import}" | grep '^locals' >/dev/null 2>&1 &&
 {
   test "$#" -gt 0 ||
   { printf "%s\n" "[ERROR] '"${locals}"'_declare: no variables provided" >&2; return 127; }
-  test "${__st_'"${locals}"'=0}" -ge 0 2> /dev/null ||
-  { printf "%s\n" "[ERROR] '"${locals}"'_declare: '\''__st_'"${locals}"''\'' isn'\''t an integer" >&2; return 127; }
-  if test "$__st_'"${locals}"'" -gt 0
+  if test "${__st_'"${locals}"'+y}" && test "${__st_'"${locals}"'}" -ge 0 2>/dev/null
   then
     set x "$__st_'"${locals}"'" "$@" && shift || return 125
-    __st_'"${locals}"'=`expr "1" "+" "$__st_'"${locals}"'" || test "$?" -eq 1` || return 125
+    __st_'"${locals}"'=`expr "1" "+" "${__st_'"${locals}"'}" || test "$?" -eq 1` || return 125
     eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''__st_'"${locals}"'=${1};unset \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" && shift || return 125
   else
+    __st_'"${locals}"'=0
     eval "__st_'"${locals}"'${__st_'"${locals}"'}='\''unset \"__st_'"${locals}"'\" \"__st_'"${locals}"'${__st_'"${locals}"'}\"'\''" || return 125
   fi
   while test "$#" -gt 0

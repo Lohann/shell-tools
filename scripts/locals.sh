@@ -13,14 +13,13 @@ locals_declare ()
 {
   test "$#" -gt 0 ||
   { printf "%s\n" "[ERROR] locals_declare: no variables provided" >&2; return 127; }
-  test "${__st_locals=0}" -ge 0 2> /dev/null ||
-  { printf "%s\n" "[ERROR] locals_declare: '__st_locals' isn't an integer" >&2; return 127; }
-  if test "$__st_locals" -gt 0
+  if test "${__st_locals+y}" && test "${__st_locals}" -ge 0 2>/dev/null
   then
     set x "$__st_locals" "$@" && shift || return 125
-    __st_locals=`expr "1" "+" "$__st_locals" || test "$?" -eq 1` || return 125
+    __st_locals=`expr "1" "+" "${__st_locals}" || test "$?" -eq 1` || return 125
     eval "__st_locals${__st_locals}='__st_locals=${1};unset \"__st_locals${__st_locals}\"'" && shift || return 125
   else
+    __st_locals=0
     eval "__st_locals${__st_locals}='unset \"__st_locals\" \"__st_locals${__st_locals}\"'" || return 125
   fi
   while test "$#" -gt 0

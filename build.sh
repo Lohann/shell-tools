@@ -451,7 +451,6 @@ v=''; unset 'v'
 # 9. Merge all scripts
 _st_body="$(eval "_st_build '${_st_import}' >&2 && printf '%s\n' \"\${${_st_import}}\"")"
 
-
 # 10. Write to var `_st_body` to output.
 case "${_st_output}" in
   '-') printf '%s\n' "${_st_body}" ;;
