@@ -11,20 +11,21 @@
 #  errors (red) and warnings (yellow),
 # 
 # Colors Escapes:
-# @b: bold
-# @e: red
-# @w: yellow
-# @E: red + bold
-# @W: yellow + bold
+# @n: bold
+# @r: red     | @R: red + bold
+# @g: green   | @G: green + bold
+# @b: blue    | @B: blue + bold
+# @y: yellow  | @Y: yellow + bold
+# @c: cyan    | @C: cyan + bold
 #
 # Usage:
+# - printf_colors '@R @y %s @b @Y @g @C\n' 'all' 'colors' 'mixed' 'in' 'the' 'same' 'text'
 # - printf_colors '%s\n' 'normal text'
-# - printf_colors '@b\n' 'bold text'
-# - printf_colors '@e\n' 'red text'
-# - printf_colors '@w\n' 'yellow text'
-# - printf_colors '@E\n' 'red+bold'
-# - printf_colors '@W\n' 'yellow+bold'
-# - printf_colors '@E @w %s @b @W @e @w\n' 'all' 'colors' 'mixed' 'in' 'the' 'same' 'text'
+# - printf_colors '@n\n' 'bold text'
+# - printf_colors '@r\n' 'red text'
+# - printf_colors '@y\n' 'yellow text'
+# - printf_colors '@R\n' 'red+bold'
+# - printf_colors '@Y\n' 'yellow+bold'
 if test -t 1 && (tput colors && colors=`tput colors` && test "x$colors" != 'x' && test 8 -le "$colors") >/dev/null 2>&1
 then
   # Eval is used to hardcode the escape sequences in the function body,
@@ -35,11 +36,14 @@ then
   test \"\$#\" -gt 0 || { printf; return \"\$?\"; }
   set x '{
   s/\\([\\\\\$\`\"]\\)/\\\\\\1/g
-  s/\\(@[EWbew]\\)/\\1%s\\\${4}/g
-  s/\\(@[EWb]\\)/\\\${1}\\1/g
-  s/@b//g
-  s/@[Ww]/\\\${2}/g
-  s/@[Ee]/\\\${3}/g
+  s/\\(@[RGBYCrgbycn]\\)/\\1%s\\\${7}/g
+  s/\\(@[RGBYCn]\\)/\\\${1}\\1/g
+  s/@n//g
+  s/@[Rr]/\\\${2}/g
+  s/@[Gg]/\\\${3}/g
+  s/@[Bb]/\\\${4}/g
+  s/@[Yy]/\\\${5}/g
+  s/@[Cc]/\\\${6}/g
   1s/^x/x\"/
   \$s/x\$/\"x/
 }' \"{
@@ -58,8 +62,8 @@ then
   }
 }\" \"\$@\" && shift || return 125
   eval 'shift && shift && shift && set x '\"\`eval 'printf \"x%sx\" \"\$3\" | sed -e \"\$1\" -e \"\$2\"'\`\"' \"\$@\"' && shift || return \"\$?\"
-  set x '`tput bold`' '`tput setaf 3`' '`tput setaf 1`' '`tput sgr0`' \"\$@\" && shift || return \"\$?\"
-  eval \"eval 'shift && shift && shift && shift && shift && set x \\\"'\$5'\\\" \\\"\\\$@\\\"'\" && shift || return \"\$?\"
+  set x '`tput bold`' '`tput setaf 1`' '`tput setaf 2`' '`tput setaf 4`' '`tput setaf 3`' '`tput setaf 6`' '`tput sgr0`' \"\$@\" && shift || return \"\$?\"
+  eval \"eval 'shift && shift && shift && shift && shift && shift && shift && shift && set x \\\"'\$8'\\\" \\\"\\\$@\\\"'\" && shift || return \"\$?\"
   printf \"\$@\"
 }" || { printf '%s\n' "failed to define function 'printf_colors' status $?" >&2; exit 1; }
 else printf_colors ()
@@ -69,8 +73,8 @@ else printf_colors ()
   set x '{
     1s/^x//
     $s/x$//
-    s/\([\\#$`"]\)/\\\1/g
-    s/\(@[EWbew]\)/%s/g
+    s/\([\\$`"]\)/\\\1/g
+    s/\(@[RGBYCrgbycn]\)/%s/g
   }' "$@" && shift || return 125;
   (st_fmt=`printf x%sx "$2" | LC_ALL=C sed "$1" 2> /dev/null` &&
   shift &&

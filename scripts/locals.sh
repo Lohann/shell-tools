@@ -6,7 +6,7 @@
 # local builtin, it saves the provided variable values and names
 # in a stack prefixed with `_st_locals$NUMBER`, then unset their values,
 # remember to call `locals_release` to restore previous variable values.
-# IMPORTANT: variables with prefix `_st_local` can't be used as local as 
+# IMPORTANT: variables with prefix `__st_local` can't be used as local as 
 # they are reserved exclusively to `locals_declare` and `locals_release`
 # methods.
 locals_declare ()
@@ -29,12 +29,12 @@ locals_declare ()
       test "x$__st_locals" != "x__st_locals" || { shift || return 125; continue; }
       { set x "$__st_locals" "$@" && shift; } || return 125
       __st_locals=`expr "1" "+" "$__st_locals" || test "$?" -eq 1` || return 125
-      eval "__st_locals${__st_locals}=\"${2}=\\\$__st_locals${1};\$__st_locals${1} \\\"__st_locals${__st_locals}\\\"\" &&
-      __st_locals${1}=\$${2} &&
+      eval "__st_locals${__st_locals}=\"${2}=\\\${__st_locals${1}};\${__st_locals${1}} \\\"__st_locals${__st_locals}\\\"\" &&
+      __st_locals${1}=\${${2}} &&
       unset '${2}'" || return 125
       { shift && shift; } || return 125
     else
-      eval "__st_locals${__st_locals}=\"\$__st_locals${__st_locals} \\\"${1}\\\"\"" && shift || return 125
+      eval "__st_locals${__st_locals}=\"\${__st_locals${__st_locals}} \\\"${1}\\\"\"" && shift || return 125
     fi
   done
 }
