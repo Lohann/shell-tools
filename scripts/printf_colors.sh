@@ -34,52 +34,37 @@ then
   eval "printf_colors ()
 {
   test \"\$#\" -gt 0 || { printf; return \"\$?\"; }
-  set x '{
-  s/\\([\\\\\$\`\"]\\)/\\\\\\1/g
-  s/\\(@[RGBYCrgbycn]\\)/\\1%s\\\${7}/g
-  s/\\(@[RGBYCn]\\)/\\\${1}\\1/g
+  set x 'eval printf \"x%sx\" \"\$3\" | sed \"\$2\" 2>/dev/null' '{
+  s/'\\''/'\\''\\\\'\\'\\''/g
+  s/[\\\\\$\`\"]/\\\\&/g
+  s/@[RGBYCrgbycn]/&%s\\\${7}/g
+  s/@[RGBYCn]/\\\${1}&/g
   s/@n//g
   s/@[Rr]/\\\${2}/g
   s/@[Gg]/\\\${3}/g
   s/@[Bb]/\\\${4}/g
   s/@[Yy]/\\\${5}/g
   s/@[Cc]/\\\${6}/g
-  1s/^x/x\"/
-  \$s/x\$/\"x/
-}' \"{
-  1s/^x//
-  \\\$s/x\\\$//
-  s/[^']*[^']/\\\\n&\\\\n/g
-  \\\$!s/\\\\n\\\$//
-  \\\$!s/'\\\$/'\\\\n/
-  1!s/^\\\\n//
-  1!s/^'/\\\\n'/
-  s/'/\\\\\\\\&/g
-  s/\\\\n/'/g
-  /^\\\$/{
-    1s/^/'/
-    \\\$s/\\\$/'/
-  }
-}\" \"\$@\" && shift || return 125
-  eval 'shift && shift && shift && set x '\"\`eval 'printf \"x%sx\" \"\$3\" | sed -e \"\$1\" -e \"\$2\"'\`\"' \"\$@\"' && shift || return \"\$?\"
-  set x '`tput bold`' '`tput setaf 1`' '`tput setaf 2`' '`tput setaf 4`' '`tput setaf 3`' '`tput setaf 6`' '`tput sgr0`' \"\$@\" && shift || return \"\$?\"
-  eval \"eval 'shift && shift && shift && shift && shift && shift && shift && shift && set x \\\"'\$8'\\\" \\\"\\\$@\\\"'\" && shift || return \"\$?\"
+  s/'\\''/'\\''\\\\'\\'\\''/g
+  1s/^x/shift \\&\\& shift \\&\\& shift \\&\\& set x '\\'\\\"\\''\\\\'\\'\\''/
+  \$s/x\$/'\\''\\\\'\\'\\'\\\"\\'' \\\"\\\$@\\\" \\&\\& shift/
+}' \"\$@\" && shift || return 125
+  eval \"\`\$1\`\" || return 125
+  set x '`tput bold`' '`tput setaf 1`' '`tput setaf 2`' '`tput setaf 4`' '`tput setaf 3`' '`tput setaf 6`' '`tput sgr0`' \"\$@\" && shift || return 125
+  eval \"eval 'shift && shift && shift && shift && shift && shift && shift && shift && set x '\$8' \\\"\\\$@\\\" && shift'\" || return 125
   printf \"\$@\"
 }" || { printf '%s\n' "failed to define function 'printf_colors' status $?" >&2; exit 1; }
 else printf_colors ()
 {
   # terminal doesn't support colors or tput not found, this sed
   # script simply replace all colors escape sequences with `%s`.
-  set x '{
-    1s/^x//
-    $s/x$//
-    s/\([\\$`"]\)/\\\1/g
-    s/\(@[RGBYCrgbycn]\)/%s/g
+  set x 'eval printf "x%sx" "$3" | sed "$2" 2>/dev/null' '{
+    s/[\\$`"]/\\&/g
+    s/@[RGBYCrgbycn]/%s/g
+    1s/^x/shift \&\& shift \&\& shift \&\& set x "/
+    $s/x$/" "\$@" \&\& shift/
   }' "$@" && shift || return 125;
-  (st_fmt=`printf x%sx "$2" | LC_ALL=C sed "$1" 2> /dev/null` &&
-  shift &&
-  shift &&
-  eval "st_fmt=\"${st_fmt}\"" > /dev/null 2>&1 &&
-  printf "${st_fmt}" "$@";)
+  eval "`$1`" || return 125
+  printf "$@"
 } # printf_colors
 fi
