@@ -4,10 +4,20 @@ Collection of reusable portable shell scripts.
 
 ## Why?
 Automating things is the most important task a system administrator has to take care of, but there are many flavors of shell, and their differences are a big concern when you have a heterogeneous environment and want to run the same script with the same result on every machine (that’s what any sane person would expect).  
-Writing [portable shell script](https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.72/html_node/Portable-Shell.html) is hard, most scripts you will find online actually uses some `bash` or `zsh` specific feature, most people are unware about those differences.
+Writing [portable shell script](https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.72/html_node/Portable-Shell.html) is hard, most scripts you will find online actually uses some `bash` or `zsh` specific feature, but different environments use different.  
+| OS                   | Default  | Bourne Shell `/bin/sh` |
+| :---                 |    :----:      |          ---:          |
+| **MacOS Tahoe**      | `zsh 5.9`      | `bash v3.2.57`         |
+| **Ubuntu / Debian**  | `bash v5.2.37` | `dash v0.5.12`         |
+| **Alpine Linux**     | `busybox ash 1.37.0` | `busybox ash 1.37.0`  |
+| **DragonFlyBSD**     | [csh](https://github.com/DragonFlyBSD/DragonFlyBSD/tree/master/bin/csh) | [mksh](https://github.com/DragonFlyBSD/DragonFlyBSD/blob/master/bin/sh/sh.1)       |
+| **Solaris**          | [ksh93](https://github.com/kofemann/opensolaris/tree/master/usr/src/cmd/ksh) | [sun bourne shell](https://github.com/kofemann/opensolaris/tree/master/usr/src/cmd/sh)  |
+| **Windows**          | [Git Bash](https://git-scm.com/install/windows), [Cygwin](https://cygwin.com/) |
+
+busybox ash 1.37.0
 
 ## Project Goals
-- **Portable:** All scripts must work consistently in any [posix compliant shell](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html) such as `sh`, `bash`, `dash`, `busybox ash`, `ksh88`, `zsh`, `pdksh` etc...
+- **Portable:** All scripts must work consistently in any [posix compliant shell](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html) such as `sh`, `bash`, `dash`, `busybox ash`, `ksh`, `zsh`, `pdksh`, `mksh` etc...
 - **Compatible**: Don't rely on any non-portable builtins, by default use portable code known to work in any modern posix shell, usage of environemnt specific features or commands are allowed only when there's an equivalent portable alternative (probably slower).
 - **System Agnostic:** Must work in any posix compliant operating system, including **Linux**, **MacOS**, **Windows WSL**, etc...
 
